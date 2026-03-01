@@ -17,6 +17,13 @@ class FirebaseDriverDatasource {
   String get _dailyPath => AppConstants.dailyEntriesCollection;
   String get _weeklyPath => AppConstants.weeklyStatusCollection;
 
+  String _dailyEntryDocId(String driverId, DateTime date) {
+    final day = DateTime(date.year, date.month, date.day);
+    final mm = day.month.toString().padLeft(2, '0');
+    final dd = day.day.toString().padLeft(2, '0');
+    return '${driverId}_${day.year}$mm$dd';
+  }
+
   // --- Driver profile (docId = userId)
   Future<DriverProfileEntity?> getDriverProfile(String userId) async {
     final doc = await _firestore.collection(_driversPath).doc(userId).get();
@@ -64,18 +71,24 @@ class FirebaseDriverDatasource {
   Future<String> saveDailyEntry(DailyEntryEntity entry) async {
     final model = DailyEntryModel.fromEntity(entry);
     final data = model.toFirestore();
-    data['createdAt'] = DateTime.now();
     data['driverId'] = entry.driverId;
-    data['date'] = entry.date;
-    if (entry.id.isEmpty) {
-      final ref = await _firestore.collection(_dailyPath).add(data);
-      return ref.id;
+    data['date'] = DateTime(entry.date.year, entry.date.month, entry.date.day);
+    data['updatedAt'] = FieldValue.serverTimestamp();
+    if (entry.createdAt == null) {
+      data['createdAt'] = FieldValue.serverTimestamp();
     }
-    await _firestore.collection(_dailyPath).doc(entry.id).set(data, SetOptions(merge: true));
-    return entry.id;
+
+    final docId = entry.id.isNotEmpty ? entry.id : _dailyEntryDocId(entry.driverId, entry.date);
+    final docRef = _firestore.collection(_dailyPath).doc(docId);
+    await docRef.set(data, SetOptions(merge: true));
+    return docId;
   }
 
   Future<String?> getDailyEntryId(String driverId, DateTime date) async {
+    final docId = _dailyEntryDocId(driverId, date);
+    final doc = await _firestore.collection(_dailyPath).doc(docId).get();
+    if (doc.exists) return doc.id;
+
     final start = DateTime(date.year, date.month, date.day);
     final end = start.add(const Duration(days: 1));
     final q = await _firestore
@@ -90,6 +103,12 @@ class FirebaseDriverDatasource {
   }
 
   Future<DailyEntryEntity?> getDailyEntry(String driverId, DateTime date) async {
+    final docId = _dailyEntryDocId(driverId, date);
+    final doc = await _firestore.collection(_dailyPath).doc(docId).get();
+    if (doc.exists) {
+      return DailyEntryModel.fromFirestore(doc.data()!, doc.id);
+    }
+
     final start = DateTime(date.year, date.month, date.day);
     final end = start.add(const Duration(days: 1));
     final q = await _firestore
@@ -100,8 +119,8 @@ class FirebaseDriverDatasource {
         .limit(1)
         .get();
     if (q.docs.isEmpty) return null;
-    final doc = q.docs.first;
-    return DailyEntryModel.fromFirestore(doc.data(), doc.id);
+    final matchedDoc = q.docs.first;
+    return DailyEntryModel.fromFirestore(matchedDoc.data(), matchedDoc.id);
   }
 
   Future<List<DailyEntryEntity>> getDailyEntriesByDriver(String driverId, {DateTime? start, DateTime? end}) async {

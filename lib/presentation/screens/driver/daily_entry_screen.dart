@@ -37,6 +37,24 @@ class _DailyEntryScreenState extends State<DailyEntryScreen> {
   bool _filledFromEntry = false;
   bool _filledFromProfile = false;
 
+  Future<void> _pickTime(TextEditingController controller) async {
+    final picked = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.now(),
+    );
+    if (picked == null) return;
+
+    final now = DateTime.now();
+    final value = DateTime(
+      now.year,
+      now.month,
+      now.day,
+      picked.hour,
+      picked.minute,
+    );
+    controller.text = DateFormat('hh:mm a').format(value);
+  }
+
   @override
   void dispose() {
     _driverName.dispose();
@@ -108,6 +126,28 @@ class _DailyEntryScreenState extends State<DailyEntryScreen> {
               key: _formKey,
               child: Column(
                 children: [
+                  if (entryCtrl.loadError.value.isNotEmpty) ...[
+                    SectionCard(
+                      title: 'Notice',
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          Text(entryCtrl.loadError.value),
+                          const SizedBox(height: 8),
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: TextButton(
+                              onPressed: entryCtrl.isLoading.value
+                                  ? null
+                                  : () => entryCtrl.loadTodayEntry(),
+                              child: const Text('Retry'),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const SizedBox(height: 12),
+                  ],
                   SectionCard(
                     title: 'Date & Driver',
                     child: Column(
@@ -131,6 +171,7 @@ class _DailyEntryScreenState extends State<DailyEntryScreen> {
                         AppTextField(
                           controller: _driverName,
                           label: 'Driver Name',
+                          enabled: false,
                           validator: (v) => (v == null || v.trim().isEmpty) ? 'Required' : null,
                         ),
                       ],
@@ -152,7 +193,10 @@ class _DailyEntryScreenState extends State<DailyEntryScreen> {
                         AppTextField(
                           controller: _startTime,
                           label: 'Starting Time',
-                          hint: 'e.g. 09:00',
+                          hint: 'Select time',
+                          readOnly: true,
+                          onTap: () => _pickTime(_startTime),
+                          suffixIcon: const Icon(Icons.access_time),
                         ),
                         const SizedBox(height: 12),
                         AppTextField(
@@ -166,7 +210,10 @@ class _DailyEntryScreenState extends State<DailyEntryScreen> {
                         AppTextField(
                           controller: _endTime,
                           label: 'Ending Time',
-                          hint: 'e.g. 18:00',
+                          hint: 'Select time',
+                          readOnly: true,
+                          onTap: () => _pickTime(_endTime),
+                          suffixIcon: const Icon(Icons.access_time),
                         ),
                         const SizedBox(height: 12),
                         AppRadioGroup<String>(

@@ -32,8 +32,7 @@ class DriverRepositoryImpl implements DriverRepository {
 
   @override
   Future<void> saveDailyEntry(DailyEntryEntity entry) async {
-    final existing = await _driverDs.getDailyEntry(entry.driverId, entry.date);
-    final id = existing?.id ?? '';
+    final id = entry.id;
     final toSave = DailyEntryEntity(
       id: id,
       driverId: entry.driverId,
@@ -51,7 +50,7 @@ class DriverRepositoryImpl implements DriverRepository {
       servicesUsed: entry.servicesUsed,
       privateTripCash: entry.privateTripCash,
       tollPaidByCustomer: entry.tollPaidByCustomer,
-      createdAt: existing?.createdAt,
+      createdAt: entry.createdAt,
       updatedAt: DateTime.now(),
     );
     await _driverDs.saveDailyEntry(toSave);

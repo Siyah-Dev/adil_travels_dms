@@ -7,7 +7,6 @@ import '../../../core/utils/app_snackbar.dart';
 import '../../controllers/auth_controller.dart';
 import '../../widgets/app_text_field.dart';
 
-/// Paste in: lib/presentation/screens/auth/login_screen.dart
 class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
 

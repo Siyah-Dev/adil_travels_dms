@@ -38,6 +38,17 @@ class ErrorHandler {
       }
     }
 
+    if (e is FirebaseException) {
+      switch (e.code) {
+        case 'permission-denied':
+          return 'You don\'t have permission to do this.';
+        case 'failed-precondition':
+          return 'Data setup is incomplete for this action. Please contact admin to configure Firestore indexes/rules.';
+        case 'unavailable':
+          return 'Service is temporarily unavailable. Please try again.';
+      }
+    }
+
     // Firestore / generic
     if (str.contains('permission-denied') || str.contains('permission_denied')) {
       return 'You don\'t have permission to do this.';

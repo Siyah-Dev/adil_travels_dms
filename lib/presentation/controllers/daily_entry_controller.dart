@@ -1,5 +1,4 @@
 import 'package:get/get.dart';
-import '../../core/constants/app_constants.dart';
 import '../../core/utils/error_handler.dart';
 import '../../domain/entities/daily_entry_entity.dart';
 import '../../domain/repositories/driver_repository.dart';
@@ -15,17 +14,26 @@ class DailyEntryController extends GetxController {
   final Rx<DailyEntryEntity?> todayEntry = Rx<DailyEntryEntity?>(null);
   final RxBool isLoading = false.obs;
   final RxBool saving = false.obs;
+  final RxString loadError = ''.obs;
 
   String get userId => Get.find<AuthController>().currentUser.value!.uid;
   String get driverName => Get.find<DriverProfileController>().profile.value?.name ?? '';
 
   Future<void> loadTodayEntry() async {
     isLoading.value = true;
+    loadError.value = '';
     try {
       final date = DateTime.now();
       todayEntry.value = await _repo.getDailyEntry(userId, date);
     } catch (e) {
-      ErrorHandler.showError(e, title: 'Could not load today\'s entry');
+      todayEntry.value = null;
+      final msg = ErrorHandler.message(e);
+      if (msg.toLowerCase().contains('permission')) {
+        loadError.value =
+            'Unable to load existing entry due to access permission. You can still fill the form and try saving.';
+      } else {
+        loadError.value = 'Could not load today\'s entry: $msg';
+      }
     } finally {
       isLoading.value = false;
     }
