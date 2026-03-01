@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "440481124362",
+    "project_id": "adil-taxi-dms",
+    "storage_bucket": "adil-taxi-dms.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:440481124362:android:54daa4dd0de782c8290ff3",
+        "android_client_info": {
+          "package_name": "com.example.adil_taxi_dms"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBBQWsOzL36XZ5kR5fhr5W-7DslM2BO3xo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
