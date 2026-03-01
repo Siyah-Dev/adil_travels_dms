@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/routes/app_pages.dart';
+import '../../../core/utils/app_dialogs.dart';
 import '../../../domain/entities/driver_profile_entity.dart';
 import '../../controllers/admin_driver_list_controller.dart';
 
@@ -41,15 +42,10 @@ class DriverListScreen extends StatelessWidget {
                               arguments: d.userId,
                             ),
                             onDelete: () async {
-                              final ok = await Get.dialog<bool>(
-                                AlertDialog(
-                                  title: const Text('Delete driver?'),
-                                  content: Text('Remove ${d.name}? This will delete their profile.'),
-                                  actions: [
-                                    TextButton(onPressed: () => Get.back(result: false), child: const Text('Cancel')),
-                                    TextButton(onPressed: () => Get.back(result: true), child: const Text('Delete')),
-                                  ],
-                                ),
+                              final ok = await AppDialogs.confirm(
+                                title: 'Delete driver?',
+                                message: 'Remove ${d.name}? This will delete their profile.',
+                                confirmText: 'Delete',
                               );
                               if (ok == true) ctrl.deleteDriver(d.userId);
                             },
@@ -90,10 +86,15 @@ class _DriverTile extends StatelessWidget {
       subtitle: Text(driver.place ?? driver.address ?? ''),
       trailing: PopupMenuButton<String>(
         onSelected: (v) {
-          if (v == 'detail') onTap();
-          else if (v == 'delete') onDelete();
-          else if (v == 'suspend') onSuspend();
-          else if (v == 'activate') onActivate();
+          if (v == 'detail') {
+            onTap();
+          } else if (v == 'delete') {
+            onDelete();
+          } else if (v == 'suspend') {
+            onSuspend();
+          } else if (v == 'activate') {
+            onActivate();
+          }
         },
         itemBuilder: (_) => [
           const PopupMenuItem(value: 'detail', child: Text('View profile')),

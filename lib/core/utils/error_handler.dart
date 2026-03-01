@@ -1,6 +1,6 @@
-import 'package:flutter/material.dart';
-import 'package:get/get.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'app_dialogs.dart';
+import 'app_snackbar.dart';
 
 /// Central error handling: user-friendly messages and error popup/snackbar.
 /// Paste in: lib/core/utils/error_handler.dart
@@ -63,42 +63,20 @@ class ErrorHandler {
   /// Shows an error popup (dialog) with a user-friendly message.
   static void showError(Object e, {String? title, String? fallback}) {
     final msg = message(e, fallback: fallback);
-    Get.dialog(
-      AlertDialog(
-        title: Text(title ?? 'Error'),
-        content: Text(msg),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
+    AppDialogs.alert(
+      title: title ?? 'Error',
+      message: msg,
       barrierDismissible: false,
     );
   }
 
   /// Shows a short success snackbar.
   static void showSuccess(String message, {String title = 'Success'}) {
-    Get.snackbar(
-      title,
-      message,
-      snackPosition: SnackPosition.BOTTOM,
-      backgroundColor: Colors.green.shade100,
-      colorText: Colors.black87,
-      duration: const Duration(seconds: 2),
-      margin: const EdgeInsets.all(12),
-    );
+    AppSnackbars.success(title, message);
   }
 
   /// Shows a short info/warning snackbar (e.g. validation).
   static void showInfo(String message, {String title = 'Notice'}) {
-    Get.snackbar(
-      title,
-      message,
-      snackPosition: SnackPosition.BOTTOM,
-      duration: const Duration(seconds: 2),
-      margin: const EdgeInsets.all(12),
-    );
+    AppSnackbars.info(title, message);
   }
 }
