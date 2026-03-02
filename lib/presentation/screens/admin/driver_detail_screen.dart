@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import '../../../core/services/supabase_storage_service.dart';
 import '../../../core/routes/app_pages.dart';
 import '../../../domain/entities/daily_entry_entity.dart';
 import '../../controllers/admin_driver_detail_controller.dart';
@@ -45,6 +46,22 @@ class DriverDetailScreen extends StatelessWidget {
                       if (d.pincode != null) _ProfileRow('Pincode', d.pincode!),
                       if (d.aadharNumber != null) _ProfileRow('Aadhar', d.aadharNumber!),
                       if (d.drivingLicenceNumber != null) _ProfileRow('Licence', d.drivingLicenceNumber!),
+                      if (d.mobileNumber != null) _ProfileRow('Mobile', d.mobileNumber!),
+                      const SizedBox(height: 12),
+                      _DriverDocImage(
+                        title: 'Profile Picture',
+                        path: d.profileImagePath,
+                      ),
+                      const SizedBox(height: 10),
+                      _DriverDocImage(
+                        title: 'Aadhar Picture',
+                        path: d.aadharImagePath,
+                      ),
+                      const SizedBox(height: 10),
+                      _DriverDocImage(
+                        title: 'Driving Licence Picture',
+                        path: d.drivingLicenceImagePath,
+                      ),
                     ],
                   ),
                 ),
@@ -111,6 +128,58 @@ class _EntryTile extends StatelessWidget {
         'Start ${entry.startKm ?? '-'} km → End ${entry.endKm ?? '-'} km | ₹${entry.totalEarning ?? 0}',
       ),
       dense: true,
+    );
+  }
+}
+
+class _DriverDocImage extends StatelessWidget {
+  const _DriverDocImage({
+    required this.title,
+    required this.path,
+  });
+
+  final String title;
+  final String? path;
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: Theme.of(context).textTheme.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+        ),
+        const SizedBox(height: 6),
+        if (path == null || path!.isEmpty)
+          const Text('-')
+        else
+          FutureBuilder<String>(
+            future: SupabaseStorageService.createSignedUrl(path!),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const SizedBox(
+                  height: 120,
+                  child: Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                );
+              }
+              if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                return const Text('Could not load image');
+              }
+              return ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.network(
+                  snapshot.data!,
+                  height: 140,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                ),
+              );
+            },
+          ),
+      ],
     );
   }
 }

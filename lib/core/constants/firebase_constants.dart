@@ -21,6 +21,9 @@ class FirebaseConstants {
   static const String mobileNumber = 'mobileNumber';
   static const String aadharNumber = 'aadharNumber';
   static const String drivingLicenceNumber = 'drivingLicenceNumber';
+  static const String profileImagePath = 'profileImagePath';
+  static const String aadharImagePath = 'aadharImagePath';
+  static const String drivingLicenceImagePath = 'drivingLicenceImagePath';
 
   // Daily entry
   static const String driverId = 'driverId';

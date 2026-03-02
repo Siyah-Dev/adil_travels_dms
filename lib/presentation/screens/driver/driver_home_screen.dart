@@ -50,19 +50,24 @@ class DriverHomeScreen extends StatelessWidget {
               profileCtrl.profile.value == null) {
             return const Center(child: CircularProgressIndicator());
           }
-          final name = profileCtrl.profile.value?.name ?? 'Driver';
+          final profile = profileCtrl.profile.value;
+          final name = profile?.name ?? 'Driver';
+          final hasPhone =
+              profile?.mobileNumber != null && profile!.mobileNumber!.trim().isNotEmpty;
+          final phone = hasPhone ? profile.mobileNumber! : 'Mobile Number';
+          final imagePath = profile?.profileImagePath;
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Card(
-                  child: ListTile(
-                    leading: const CircleAvatar(child: Icon(Icons.person)),
-                    title: Text(name),
-                    subtitle: const Text('Tap to edit profile'),
-                    onTap: () => Get.toNamed(AppRoutes.driverProfile),
-                  ),
+                _DriverProfileSummaryCard(
+                  name: name,
+                  phone: phone,
+                  isPhonePlaceholder: !hasPhone,
+                  imagePath: imagePath,
+                  signedUrlLoader: profileCtrl.getSignedUrl,
+                  onTap: () => Get.toNamed(AppRoutes.driverProfile),
                 ),
                 const SizedBox(height: 24),
                 NavigationMenuTile(
@@ -83,6 +88,115 @@ class DriverHomeScreen extends StatelessWidget {
             ),
           );
         },
+      ),
+    );
+  }
+}
+
+class _DriverProfileSummaryCard extends StatelessWidget {
+  const _DriverProfileSummaryCard({
+    required this.name,
+    required this.phone,
+    required this.isPhonePlaceholder,
+    required this.imagePath,
+    required this.signedUrlLoader,
+    required this.onTap,
+  });
+
+  final String name;
+  final String phone;
+  final bool isPhonePlaceholder;
+  final String? imagePath;
+  final Future<String?> Function(String?) signedUrlLoader;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final avatar = imagePath == null || imagePath!.isEmpty
+        ? const CircleAvatar(
+            radius: 44,
+            child: Icon(Icons.person, size: 38),
+          )
+        : FutureBuilder<String?>(
+            future: signedUrlLoader(imagePath),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const CircleAvatar(
+                  radius: 44,
+                  child: SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  ),
+                );
+              }
+              if (!snapshot.hasData || snapshot.data == null || snapshot.data!.isEmpty) {
+                return const CircleAvatar(
+                  radius: 44,
+                  child: Icon(Icons.person, size: 38),
+                );
+              }
+              return CircleAvatar(
+                radius: 44,
+                backgroundImage: NetworkImage(snapshot.data!),
+              );
+            },
+          );
+
+    return Card(
+      clipBehavior: Clip.antiAlias,
+      child: InkWell(
+        onTap: onTap,
+        child: AspectRatio(
+          aspectRatio: 1,
+          child: Stack(
+            children: [
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
+                child: Align(
+                  alignment: Alignment.center,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      avatar,
+                      const SizedBox(height: 14),
+                      Text(
+                        name,
+                        textAlign: TextAlign.center,
+                        style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                              fontWeight: FontWeight.w700,
+                            ),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        phone,
+                        textAlign: TextAlign.center,
+                        style: isPhonePlaceholder
+                            ? Theme.of(context).textTheme.bodyMedium?.copyWith(
+                                  color: Theme.of(context).colorScheme.onSurfaceVariant,
+                                )
+                            : Theme.of(context).textTheme.titleMedium,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 6,
+                right: 6,
+                child: TextButton(
+                  onPressed: onTap,
+                  child: const Text('Edit Profile'),
+                ),
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }

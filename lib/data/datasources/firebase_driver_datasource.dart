@@ -52,6 +52,9 @@ class FirebaseDriverDatasource {
       mobileNumber: profile.mobileNumber,
       aadharNumber: profile.aadharNumber,
       drivingLicenceNumber: profile.drivingLicenceNumber,
+      profileImagePath: profile.profileImagePath,
+      aadharImagePath: profile.aadharImagePath,
+      drivingLicenceImagePath: profile.drivingLicenceImagePath,
       updatedAt: DateTime.now(),
     );
     await _firestore.collection(_driversPath).doc(id).set(

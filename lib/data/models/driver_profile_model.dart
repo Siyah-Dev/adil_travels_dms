@@ -15,6 +15,9 @@ class DriverProfileModel extends DriverProfileEntity {
     super.mobileNumber,
     super.aadharNumber,
     super.drivingLicenceNumber,
+    super.profileImagePath,
+    super.aadharImagePath,
+    super.drivingLicenceImagePath,
     super.updatedAt,
   });
 
@@ -29,6 +32,9 @@ class DriverProfileModel extends DriverProfileEntity {
         mobileNumber: e.mobileNumber,
         aadharNumber: e.aadharNumber,
         drivingLicenceNumber: e.drivingLicenceNumber,
+        profileImagePath: e.profileImagePath,
+        aadharImagePath: e.aadharImagePath,
+        drivingLicenceImagePath: e.drivingLicenceImagePath,
         updatedAt: e.updatedAt,
       );
 
@@ -44,6 +50,9 @@ class DriverProfileModel extends DriverProfileEntity {
       mobileNumber: map[FirebaseConstants.mobileNumber] as String?,
       aadharNumber: map[FirebaseConstants.aadharNumber] as String?,
       drivingLicenceNumber: map[FirebaseConstants.drivingLicenceNumber] as String?,
+      profileImagePath: map[FirebaseConstants.profileImagePath] as String?,
+      aadharImagePath: map[FirebaseConstants.aadharImagePath] as String?,
+      drivingLicenceImagePath: map[FirebaseConstants.drivingLicenceImagePath] as String?,
       updatedAt: (map['updatedAt'] as dynamic)?.toDate(),
     );
   }
@@ -59,6 +68,9 @@ class DriverProfileModel extends DriverProfileEntity {
       if (mobileNumber != null) FirebaseConstants.mobileNumber: mobileNumber,
       if (aadharNumber != null) FirebaseConstants.aadharNumber: aadharNumber,
       if (drivingLicenceNumber != null) FirebaseConstants.drivingLicenceNumber: drivingLicenceNumber,
+      if (profileImagePath != null) FirebaseConstants.profileImagePath: profileImagePath,
+      if (aadharImagePath != null) FirebaseConstants.aadharImagePath: aadharImagePath,
+      if (drivingLicenceImagePath != null) FirebaseConstants.drivingLicenceImagePath: drivingLicenceImagePath,
       'updatedAt': DateTime.now(),
     };
   }
