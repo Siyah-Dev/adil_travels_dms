@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:intl/intl.dart';
+import '../../../core/routes/app_pages.dart';
 import '../../../domain/entities/daily_entry_entity.dart';
 import '../../controllers/admin_daily_entries_controller.dart';
 import '../../widgets/section_card.dart';
@@ -73,6 +74,11 @@ class _EntryCard extends StatelessWidget {
         title: Text(entry.driverName),
         subtitle: Text(
           '${entry.vehicleNumber ?? '-'} | ${entry.startKm ?? '-'} - ${entry.endKm ?? '-'} km | Earning ₹${entry.totalEarning ?? 0}',
+        ),
+        trailing: const Icon(Icons.chevron_right),
+        onTap: () => Get.toNamed(
+          AppRoutes.adminDailyEntryDetail,
+          arguments: entry,
         ),
       ),
     );
