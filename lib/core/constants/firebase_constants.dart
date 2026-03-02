@@ -37,6 +37,8 @@ class FirebaseConstants {
   static const String servicesUsed = 'servicesUsed';
   static const String privateTripCash = 'privateTripCash';
   static const String tollPaidByCustomer = 'tollPaidByCustomer';
+  static const String leaveOnToday = 'leaveOnToday';
+  static const String leaveEnabledAt = 'leaveEnabledAt';
 
   // Weekly status
   static const String weekStartDate = 'weekStartDate';

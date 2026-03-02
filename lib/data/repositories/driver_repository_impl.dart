@@ -2,6 +2,7 @@ import '../../core/constants/app_constants.dart';
 import '../../domain/entities/driver_profile_entity.dart';
 import '../../domain/entities/daily_entry_entity.dart';
 import '../../domain/entities/weekly_status_entity.dart';
+import '../../domain/entities/vehicle_entity.dart';
 import '../../domain/repositories/driver_repository.dart';
 import '../datasources/firebase_auth_datasource.dart';
 import '../datasources/firebase_driver_datasource.dart';
@@ -31,6 +32,16 @@ class DriverRepositoryImpl implements DriverRepository {
       _authDs.setSuspended(driverId, suspended);
 
   @override
+  Future<List<VehicleEntity>> getVehicles() => _driverDs.getVehicles();
+
+  @override
+  Future<void> addVehicle(String name, String number) =>
+      _driverDs.addVehicle(name, number);
+
+  @override
+  Future<void> deleteVehicle(String number) => _driverDs.deleteVehicle(number);
+
+  @override
   Future<void> saveDailyEntry(DailyEntryEntity entry) async {
     final id = entry.id;
     final toSave = DailyEntryEntity(
@@ -48,6 +59,8 @@ class DriverRepositoryImpl implements DriverRepository {
       totalEarning: entry.totalEarning,
       cashCollected: entry.cashCollected,
       servicesUsed: entry.servicesUsed,
+      leaveOnToday: entry.leaveOnToday,
+      leaveEnabledAt: entry.leaveEnabledAt,
       privateTripCash: entry.privateTripCash,
       tollPaidByCustomer: entry.tollPaidByCustomer,
       createdAt: entry.createdAt,

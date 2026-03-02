@@ -9,12 +9,14 @@ class AppRadioGroup<T extends String> extends StatelessWidget {
     required this.value,
     required this.onChanged,
     this.title,
+    this.enabled = true,
   });
 
   final List<T> options;
   final T? value;
   final ValueChanged<T?> onChanged;
   final String? title;
+  final bool enabled;
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +32,7 @@ class AppRadioGroup<T extends String> extends StatelessWidget {
               title: Text(option),
               value: option,
               groupValue: value,
-              onChanged: (v) => onChanged(v),
+              onChanged: enabled ? (v) => onChanged(v) : null,
             )),
       ],
     );

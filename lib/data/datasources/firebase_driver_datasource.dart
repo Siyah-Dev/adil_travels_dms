@@ -1,11 +1,14 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../core/constants/app_constants.dart';
+import '../../core/constants/firebase_constants.dart';
 import '../../domain/entities/driver_profile_entity.dart';
 import '../../domain/entities/daily_entry_entity.dart';
 import '../../domain/entities/weekly_status_entity.dart';
+import '../../domain/entities/vehicle_entity.dart';
 import '../models/driver_profile_model.dart';
 import '../models/daily_entry_model.dart';
 import '../models/weekly_status_model.dart';
+import '../models/vehicle_model.dart';
 
 /// Firebase driver, daily entry, weekly status datasource.
 /// Paste in: lib/data/datasources/firebase_driver_datasource.dart
@@ -14,6 +17,7 @@ class FirebaseDriverDatasource {
 
   // Drivers subcollection under users, or separate collection
   String get _driversPath => AppConstants.driversCollection;
+  String get _vehiclesPath => AppConstants.vehiclesCollection;
   String get _dailyPath => AppConstants.dailyEntriesCollection;
   String get _weeklyPath => AppConstants.weeklyStatusCollection;
 
@@ -22,6 +26,10 @@ class FirebaseDriverDatasource {
     final mm = day.month.toString().padLeft(2, '0');
     final dd = day.day.toString().padLeft(2, '0');
     return '${driverId}_${day.year}$mm$dd';
+  }
+
+  String _vehicleDocId(String number) {
+    return number.trim().toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '_');
   }
 
   // --- Driver profile (docId = userId)
@@ -65,6 +73,43 @@ class FirebaseDriverDatasource {
 
   Future<void> deleteDriver(String driverId) async {
     await _firestore.collection(_driversPath).doc(driverId).delete();
+  }
+
+  // --- Vehicles
+  Future<List<VehicleEntity>> getVehicles() async {
+    final snap = await _firestore.collection(_vehiclesPath).orderBy(FirebaseConstants.name).get();
+    return snap.docs.map((d) => VehicleModel.fromFirestore(d.data(), d.id)).toList();
+  }
+
+  Future<void> addVehicle(String name, String number) async {
+    final trimmedName = name.trim();
+    final trimmedNumber = number.trim();
+    final id = _vehicleDocId(trimmedNumber);
+    await _firestore.collection(_vehiclesPath).doc(id).set({
+      FirebaseConstants.name: trimmedName,
+      FirebaseConstants.vehicleNumber: trimmedNumber,
+      FirebaseConstants.createdAt: FieldValue.serverTimestamp(),
+      'updatedAt': FieldValue.serverTimestamp(),
+    }, SetOptions(merge: true));
+  }
+
+  Future<void> deleteVehicle(String number) async {
+    final id = _vehicleDocId(number);
+    final directRef = _firestore.collection(_vehiclesPath).doc(id);
+    final direct = await directRef.get();
+    if (direct.exists) {
+      await directRef.delete();
+      return;
+    }
+
+    final fallback = await _firestore
+        .collection(_vehiclesPath)
+        .where(FirebaseConstants.vehicleNumber, isEqualTo: number.trim())
+        .limit(1)
+        .get();
+    if (fallback.docs.isNotEmpty) {
+      await fallback.docs.first.reference.delete();
+    }
   }
 
   // --- Daily entries
