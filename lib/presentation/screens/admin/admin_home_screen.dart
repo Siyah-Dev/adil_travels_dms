@@ -48,7 +48,6 @@ class AdminHomeScreen extends StatelessWidget {
             icon: Icons.people,
             title: 'Manage Drivers',
             subtitle: 'View, search, delete, suspend drivers',
-            margin: EdgeInsets.zero,
             onTap: () => Get.toNamed(AppRoutes.adminDriverList),
           ),
           NavigationMenuTile(
@@ -56,6 +55,12 @@ class AdminHomeScreen extends StatelessWidget {
             title: 'Daily Entries',
             subtitle: 'View drivers\' daily entries by date',
             onTap: () => Get.toNamed(AppRoutes.adminDailyEntries),
+          ),
+          NavigationMenuTile(
+            icon: Icons.directions_car,
+            title: 'Manage Vehicles',
+            subtitle: 'Add or remove vehicles for drivers',
+            onTap: () => Get.toNamed(AppRoutes.adminVehicles),
           ),
           NavigationMenuTile(
             icon: Icons.date_range,
