@@ -53,7 +53,19 @@ class _WeeklyStatusScreenState extends State<WeeklyStatusScreen> {
     return Scaffold(
       appBar: AppBar(title: const Text('Weekly Status')),
       body: GetX<AdminWeeklyStatusController>(
-        initState: (_) => Get.find<AdminWeeklyStatusController>().loadDrivers(),
+        initState: (_) {
+          final args = Get.arguments;
+          String? driverId;
+          if (args is DriverProfileEntity) {
+            driverId = args.userId;
+          } else if (args is Map && args['driverId'] is String) {
+            driverId = args['driverId'] as String;
+          }
+          _filled = false;
+          Get.find<AdminWeeklyStatusController>().loadDrivers(
+            preferredDriverId: driverId,
+          );
+        },
         builder: (ctrl) {
           final s = ctrl.currentStatus.value;
           if (s != null) WidgetsBinding.instance.addPostFrameCallback((_) => _fillFromStatus(s));
@@ -75,7 +87,7 @@ class _WeeklyStatusScreenState extends State<WeeklyStatusScreen> {
                 SectionCard(
                   title: 'Select Driver',
                   child: DropdownButtonFormField<DriverProfileEntity>(
-                    value: driver,
+                    initialValue: driver,
                     decoration: const InputDecoration(labelText: 'Driver'),
                     items: ctrl.drivers
                         .map((d) => DropdownMenuItem(value: d, child: Text(d.name)))

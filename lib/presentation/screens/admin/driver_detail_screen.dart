@@ -61,7 +61,10 @@ class DriverDetailScreen extends StatelessWidget {
                 ),
                 const SizedBox(height: 16),
                 OutlinedButton.icon(
-                  onPressed: () => Get.toNamed(AppRoutes.adminWeeklyStatus, arguments: d),
+                  onPressed: () => Get.toNamed(
+                    AppRoutes.adminWeeklyStatus,
+                    arguments: {'driverId': d.userId},
+                  ),
                   icon: const Icon(Icons.date_range),
                   label: const Text('Weekly Status'),
                 ),
