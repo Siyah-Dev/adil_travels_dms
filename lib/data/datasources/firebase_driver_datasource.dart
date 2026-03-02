@@ -77,7 +77,10 @@ class FirebaseDriverDatasource {
 
   // --- Vehicles
   Future<List<VehicleEntity>> getVehicles() async {
-    final snap = await _firestore.collection(_vehiclesPath).orderBy(FirebaseConstants.name).get();
+    final snap = await _firestore
+        .collection(_vehiclesPath)
+        .orderBy(FirebaseConstants.createdAt, descending: true)
+        .get();
     return snap.docs.map((d) => VehicleModel.fromFirestore(d.data(), d.id)).toList();
   }
 
