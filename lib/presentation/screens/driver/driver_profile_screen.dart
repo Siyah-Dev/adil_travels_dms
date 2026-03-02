@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import '../../../core/routes/app_pages.dart';
 import '../../controllers/driver_profile_controller.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/section_card.dart';
@@ -144,43 +143,33 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
                     ),
                   ),
                   const SizedBox(height: 24),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
-                          onPressed: () => Get.toNamed(AppRoutes.driverWeeklySummary),
-                          child: const Text('View Summary'),
-                        ),
-                      ),
-                      const SizedBox(width: 16),
-                      Expanded(
-                        child: ElevatedButton(
-                          onPressed: ctrl.isLoading.value
-                              ? null
-                              : () {
-                                  if (_formKey.currentState?.validate() ?? false) {
-                                    ctrl.saveProfile(
-                                      name: _name.text,
-                                      age: int.tryParse(_age.text),
-                                      address: _address.text.isEmpty ? null : _address.text,
-                                      place: _place.text.isEmpty ? null : _place.text,
-                                      pincode: _pincode.text.isEmpty ? null : _pincode.text,
-                                      mobileNumber: _mobile.text,
-                                      aadharNumber: _aadhar.text,
-                                      drivingLicenceNumber: _licence.text,
-                                    );
-                                  }
-                                },
-                          child: ctrl.isLoading.value
-                              ? const SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: CircularProgressIndicator(strokeWidth: 2),
-                                )
-                              : const Text('Save'),
-                        ),
-                      ),
-                    ],
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: ctrl.isLoading.value
+                          ? null
+                          : () {
+                              if (_formKey.currentState?.validate() ?? false) {
+                                ctrl.saveProfile(
+                                  name: _name.text,
+                                  age: int.tryParse(_age.text),
+                                  address: _address.text.isEmpty ? null : _address.text,
+                                  place: _place.text.isEmpty ? null : _place.text,
+                                  pincode: _pincode.text.isEmpty ? null : _pincode.text,
+                                  mobileNumber: _mobile.text,
+                                  aadharNumber: _aadhar.text,
+                                  drivingLicenceNumber: _licence.text,
+                                );
+                              }
+                            },
+                      child: ctrl.isLoading.value
+                          ? const SizedBox(
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            )
+                          : const Text('Save'),
+                    ),
                   ),
                 ],
               ),
