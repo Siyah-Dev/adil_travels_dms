@@ -84,6 +84,13 @@ class DriverHomeScreen extends StatelessWidget {
                   margin: const EdgeInsets.only(top: 12),
                   onTap: () => Get.toNamed(AppRoutes.driverWeeklySummary),
                 ),
+                NavigationMenuTile(
+                  icon: Icons.people_alt_outlined,
+                  title: 'View All Drivers',
+                  subtitle: 'See other drivers and call quickly',
+                  margin: const EdgeInsets.only(top: 12),
+                  onTap: () => Get.toNamed(AppRoutes.driverContacts),
+                ),
               ],
             ),
           );
