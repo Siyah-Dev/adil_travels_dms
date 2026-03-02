@@ -1,6 +1,7 @@
 import '../entities/driver_profile_entity.dart';
 import '../entities/daily_entry_entity.dart';
 import '../entities/weekly_status_entity.dart';
+import '../entities/vehicle_entity.dart';
 
 /// Driver repository contract.
 /// Paste in: lib/domain/repositories/driver_repository.dart
@@ -12,6 +13,11 @@ abstract class DriverRepository {
   Future<List<DriverProfileEntity>> searchDrivers(String query);
   Future<void> deleteDriver(String driverId);
   Future<void> setDriverSuspended(String driverId, bool suspended);
+
+  // Vehicles
+  Future<List<VehicleEntity>> getVehicles();
+  Future<void> addVehicle(String name, String number);
+  Future<void> deleteVehicle(String number);
 
   // Daily entries
   Future<void> saveDailyEntry(DailyEntryEntity entry);

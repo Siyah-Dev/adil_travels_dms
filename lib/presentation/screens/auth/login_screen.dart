@@ -2,10 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/constants/app_constants.dart';
 import '../../../core/routes/app_pages.dart';
+import '../../../core/utils/app_dialogs.dart';
+import '../../../core/utils/app_snackbar.dart';
 import '../../controllers/auth_controller.dart';
 import '../../widgets/app_text_field.dart';
 
-/// Paste in: lib/presentation/screens/auth/login_screen.dart
 class LoginScreen extends StatelessWidget {
   LoginScreen({super.key});
 
@@ -20,53 +21,23 @@ class LoginScreen extends StatelessWidget {
     auth.error.value = '';
   }
 
-  Future<void> _showForgotPasswordDialog(
-    BuildContext context,
-    AuthController auth,
-  ) async {
-    final emailController = TextEditingController(text: _email.text.trim());
-    await showDialog<void>(
-      context: context,
-      builder: (dialogContext) {
-        return AlertDialog(
-          title: const Text('Reset Password'),
-          content: TextField(
-            controller: emailController,
-            keyboardType: TextInputType.emailAddress,
-            decoration: const InputDecoration(
-              labelText: 'Email',
-              hintText: 'Enter your account email',
-            ),
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(dialogContext).pop(),
-              child: const Text('Cancel'),
-            ),
-            TextButton(
-              onPressed: () async {
-                final email = emailController.text.trim();
-                if (email.isEmpty || !email.contains('@')) {
-                  Get.snackbar(
-                    'Invalid email',
-                    'Please enter a valid email address.',
-                    snackPosition: SnackPosition.BOTTOM,
-                    margin: const EdgeInsets.all(12),
-                  );
-                  return;
-                }
-                final sent = await auth.sendPasswordReset(email);
-                if (sent) {
-                  Get.back();
-                }
-              },
-              child: const Text('Send Link'),
-            ),
-          ],
-        );
-      },
+  Future<void> _showForgotPasswordDialog(AuthController auth) async {
+    final email = await AppDialogs.promptText(
+      title: 'Reset Password',
+      label: 'Email',
+      hint: 'Enter your account email',
+      keyboardType: TextInputType.emailAddress,
+      confirmText: 'Send Link',
+      initialValue: _email.text.trim(),
     );
-    emailController.dispose();
+
+    if (email == null) return;
+    if (email.isEmpty || !email.contains('@')) {
+      AppSnackbars.info('Invalid email', 'Please enter a valid email address.');
+      return;
+    }
+
+    await auth.sendPasswordReset(email);
   }
 
   @override
@@ -120,7 +91,7 @@ class LoginScreen extends StatelessWidget {
                     child: TextButton(
                       onPressed: auth.isLoading.value
                           ? null
-                          : () => _showForgotPasswordDialog(context, auth),
+                          : () => _showForgotPasswordDialog(auth),
                       child: const Text('Forgot password?'),
                     ),
                   ),

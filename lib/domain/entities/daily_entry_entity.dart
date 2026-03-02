@@ -15,6 +15,8 @@ class DailyEntryEntity {
   final double? totalEarning;
   final double? cashCollected;
   final String? servicesUsed;
+  final bool leaveOnToday;
+  final DateTime? leaveEnabledAt;
   final double? privateTripCash;
   final double? tollPaidByCustomer;
   final DateTime? createdAt;
@@ -35,6 +37,8 @@ class DailyEntryEntity {
     this.totalEarning,
     this.cashCollected,
     this.servicesUsed,
+    this.leaveOnToday = false,
+    this.leaveEnabledAt,
     this.privateTripCash,
     this.tollPaidByCustomer,
     this.createdAt,
@@ -42,6 +46,7 @@ class DailyEntryEntity {
   });
 
   bool get hasMandatoryFields =>
+      leaveOnToday ||
       driverName.isNotEmpty &&
       vehicleNumber != null &&
       vehicleNumber!.isNotEmpty &&

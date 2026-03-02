@@ -17,6 +17,8 @@ class AppTextField extends StatefulWidget {
     this.maxLines = 1,
     this.enabled = true,
     this.enableObscureToggle = false,
+    this.readOnly = false,
+    this.onTap,
   });
 
   final TextEditingController? controller;
@@ -31,6 +33,8 @@ class AppTextField extends StatefulWidget {
   final int maxLines;
   final bool enabled;
   final bool enableObscureToggle;
+  final bool readOnly;
+  final VoidCallback? onTap;
 
   @override
   State<AppTextField> createState() => _AppTextFieldState();
@@ -71,6 +75,8 @@ class _AppTextFieldState extends State<AppTextField> {
       onChanged: widget.onChanged,
       maxLines: widget.obscureText ? 1 : widget.maxLines,
       enabled: widget.enabled,
+      readOnly: widget.readOnly,
+      onTap: widget.onTap,
     );
   }
 }

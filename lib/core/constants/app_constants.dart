@@ -9,6 +9,7 @@ class AppConstants {
   // Collections
   static const String usersCollection = 'users';
   static const String driversCollection = 'drivers';
+  static const String vehiclesCollection = 'vehicles';
   static const String dailyEntriesCollection = 'daily_entries';
   static const String weeklyStatusCollection = 'weekly_status';
   static const String notificationsCollection = 'notifications';
@@ -16,9 +17,6 @@ class AppConstants {
   // User roles
   static const String roleAdmin = 'admin';
   static const String roleDriver = 'driver';
-
-  // Vehicle options
-  static const List<String> vehicleNumbers = ['A1', 'A2', 'A3'];
 
   // Fuel paid by
   static const String fuelPaidDriver = 'driver';
