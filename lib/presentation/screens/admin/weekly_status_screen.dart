@@ -107,7 +107,7 @@ class _WeeklyStatusScreenState extends State<WeeklyStatusScreen> {
                         ListTile(
                           title: const Text('Start'),
                           subtitle: Text(DateFormat.yMMMd().format(ctrl.weekStart)),
-                          trailing: TextButton(
+                          trailing: IconButton(
                             onPressed: () async {
                               final d = await showDatePicker(
                                 context: context,
@@ -120,7 +120,8 @@ class _WeeklyStatusScreenState extends State<WeeklyStatusScreen> {
                                 ctrl.loadWeeklyStatus(driver.userId, d);
                               }
                             },
-                            child: const Text('Pick'),
+                            tooltip: 'Pick start date',
+                            icon: const Icon(Icons.calendar_month_outlined),
                           ),
                         ),
                         ListTile(

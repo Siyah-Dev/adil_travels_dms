@@ -52,7 +52,7 @@ class _WeeklySummaryReportScreenState extends State<WeeklySummaryReportScreen> {
                       ListTile(
                         title: const Text('Start Date'),
                         subtitle: Text(_start == null ? 'Select' : DateFormat.yMMMd().format(_start!)),
-                        trailing: TextButton(
+                        trailing: IconButton(
                           onPressed: () async {
                             final d = await showDatePicker(
                               context: context,
@@ -62,13 +62,14 @@ class _WeeklySummaryReportScreenState extends State<WeeklySummaryReportScreen> {
                             );
                             if (d != null) setState(() => _start = d);
                           },
-                          child: const Text('Pick'),
+                          tooltip: 'Pick start date',
+                          icon: const Icon(Icons.calendar_month_outlined),
                         ),
                       ),
                       ListTile(
                         title: const Text('End Date'),
                         subtitle: Text(_end == null ? 'Select' : DateFormat.yMMMd().format(_end!)),
-                        trailing: TextButton(
+                        trailing: IconButton(
                           onPressed: () async {
                             final d = await showDatePicker(
                               context: context,
@@ -78,7 +79,8 @@ class _WeeklySummaryReportScreenState extends State<WeeklySummaryReportScreen> {
                             );
                             if (d != null) setState(() => _end = d);
                           },
-                          child: const Text('Pick'),
+                          tooltip: 'Pick end date',
+                          icon: const Icon(Icons.calendar_month_outlined),
                         ),
                       ),
                       ElevatedButton(
