@@ -17,10 +17,22 @@ class AdminWeeklyStatusController extends GetxController {
   DateTime weekStart = DateTime.now();
   DateTime weekEnd = DateTime.now();
 
-  Future<void> loadDrivers() async {
+  Future<void> loadDrivers({String? preferredDriverId}) async {
     isLoading.value = true;
     try {
       drivers.value = await _repo.getAllDrivers();
+      if (preferredDriverId != null && preferredDriverId.isNotEmpty) {
+        DriverProfileEntity? matched;
+        for (final d in drivers) {
+          if (d.userId == preferredDriverId) {
+            matched = d;
+            break;
+          }
+        }
+        if (matched != null) {
+          await selectDriver(matched);
+        }
+      }
     } catch (e) {
       ErrorHandler.showError(e, title: 'Could not load drivers');
     } finally {

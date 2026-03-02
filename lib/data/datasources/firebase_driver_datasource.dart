@@ -77,7 +77,10 @@ class FirebaseDriverDatasource {
 
   // --- Vehicles
   Future<List<VehicleEntity>> getVehicles() async {
-    final snap = await _firestore.collection(_vehiclesPath).orderBy(FirebaseConstants.name).get();
+    final snap = await _firestore
+        .collection(_vehiclesPath)
+        .orderBy(FirebaseConstants.createdAt, descending: true)
+        .get();
     return snap.docs.map((d) => VehicleModel.fromFirestore(d.data(), d.id)).toList();
   }
 
@@ -172,8 +175,10 @@ class FirebaseDriverDatasource {
     Query<Map<String, dynamic>> q = _firestore.collection(_dailyPath).where('driverId', isEqualTo: driverId);
     if (start != null) q = q.where('date', isGreaterThanOrEqualTo: start);
     if (end != null) q = q.where('date', isLessThanOrEqualTo: end);
-    final snap = await q.orderBy('date', descending: true).get();
-    return snap.docs.map((d) => DailyEntryModel.fromFirestore(d.data(), d.id)).toList();
+    final snap = await q.get();
+    final entries = snap.docs.map((d) => DailyEntryModel.fromFirestore(d.data(), d.id)).toList();
+    entries.sort((a, b) => b.date.compareTo(a.date));
+    return entries;
   }
 
   Future<List<DailyEntryEntity>> getDailyEntriesByDate(DateTime date) async {
@@ -221,8 +226,10 @@ class FirebaseDriverDatasource {
     Query<Map<String, dynamic>> q = _firestore.collection(_weeklyPath).where('driverId', isEqualTo: driverId);
     if (start != null) q = q.where('weekStartDate', isGreaterThanOrEqualTo: start);
     if (end != null) q = q.where('weekStartDate', isLessThanOrEqualTo: end);
-    final snap = await q.orderBy('weekStartDate', descending: true).get();
-    return snap.docs.map((d) => WeeklyStatusModel.fromFirestore(d.data(), d.id)).toList();
+    final snap = await q.get();
+    final statuses = snap.docs.map((d) => WeeklyStatusModel.fromFirestore(d.data(), d.id)).toList();
+    statuses.sort((a, b) => b.weekStartDate.compareTo(a.weekStartDate));
+    return statuses;
   }
 
   Future<List<WeeklyStatusEntity>> getWeeklyStatusesInRange(DateTime start, DateTime end) async {
@@ -230,8 +237,9 @@ class FirebaseDriverDatasource {
         .collection(_weeklyPath)
         .where('weekStartDate', isGreaterThanOrEqualTo: start)
         .where('weekStartDate', isLessThanOrEqualTo: end)
-        .orderBy('weekStartDate')
         .get();
-    return snap.docs.map((d) => WeeklyStatusModel.fromFirestore(d.data(), d.id)).toList();
+    final statuses = snap.docs.map((d) => WeeklyStatusModel.fromFirestore(d.data(), d.id)).toList();
+    statuses.sort((a, b) => a.weekStartDate.compareTo(b.weekStartDate));
+    return statuses;
   }
 }

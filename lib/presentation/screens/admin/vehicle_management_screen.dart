@@ -7,59 +7,7 @@ class VehicleManagementScreen extends StatelessWidget {
   const VehicleManagementScreen({super.key});
 
   Future<void> _showAddVehicleDialog(AdminVehicleController ctrl) async {
-    final nameController = TextEditingController();
-    final numberController = TextEditingController();
-
-    await Get.dialog<void>(
-      AlertDialog(
-        title: const Text('Add Vehicle'),
-        content: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            TextField(
-              controller: nameController,
-              decoration: const InputDecoration(labelText: 'Vehicle Name'),
-            ),
-            const SizedBox(height: 12),
-            TextField(
-              controller: numberController,
-              decoration: const InputDecoration(labelText: 'Vehicle Number'),
-            ),
-          ],
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Get.back(),
-            child: const Text('Cancel'),
-          ),
-          Obx(
-            () => TextButton(
-              onPressed: ctrl.isSaving.value
-                  ? null
-                  : () async {
-                      final ok = await ctrl.addVehicle(
-                        nameController.text,
-                        numberController.text,
-                      );
-                      if (ok) {
-                        Get.back();
-                      }
-                    },
-              child: ctrl.isSaving.value
-                  ? const SizedBox(
-                      height: 16,
-                      width: 16,
-                      child: CircularProgressIndicator(strokeWidth: 2),
-                    )
-                  : const Text('Add'),
-            ),
-          ),
-        ],
-      ),
-    );
-
-    nameController.dispose();
-    numberController.dispose();
+    await Get.dialog<bool>(_AddVehicleDialog(controller: ctrl));
   }
 
   @override
@@ -116,6 +64,86 @@ class VehicleManagementScreen extends StatelessWidget {
             },
           );
         },
+      ),
+    );
+  }
+}
+
+class _AddVehicleDialog extends StatefulWidget {
+  const _AddVehicleDialog({required this.controller});
+
+  final AdminVehicleController controller;
+
+  @override
+  State<_AddVehicleDialog> createState() => _AddVehicleDialogState();
+}
+
+class _AddVehicleDialogState extends State<_AddVehicleDialog> {
+  late final TextEditingController _nameController;
+  late final TextEditingController _numberController;
+
+  @override
+  void initState() {
+    super.initState();
+    _nameController = TextEditingController();
+    _numberController = TextEditingController();
+  }
+
+  @override
+  void dispose() {
+    _nameController.dispose();
+    _numberController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Obx(
+      () => AlertDialog(
+        title: const Text('Add Vehicle'),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: _nameController,
+              decoration: const InputDecoration(labelText: 'Vehicle Name'),
+              enabled: !widget.controller.isSaving.value,
+            ),
+            const SizedBox(height: 12),
+            TextField(
+              controller: _numberController,
+              decoration: const InputDecoration(labelText: 'Vehicle Number'),
+              enabled: !widget.controller.isSaving.value,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            onPressed: widget.controller.isSaving.value ? null : () => Get.back(),
+            child: const Text('Cancel'),
+          ),
+          TextButton(
+            onPressed: widget.controller.isSaving.value
+                ? null
+                : () async {
+                    final nav = Navigator.of(context, rootNavigator: true);
+                    final ok = await widget.controller.addVehicle(
+                      _nameController.text,
+                      _numberController.text,
+                    );
+                    if (ok) {
+                      nav.pop(true);
+                    }
+                  },
+            child: widget.controller.isSaving.value
+                ? const SizedBox(
+                    height: 16,
+                    width: 16,
+                    child: CircularProgressIndicator(strokeWidth: 2),
+                  )
+                : const Text('Add'),
+          ),
+        ],
       ),
     );
   }
