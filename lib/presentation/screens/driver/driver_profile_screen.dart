@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import '../../../core/routes/app_pages.dart';
 import '../../controllers/driver_profile_controller.dart';
@@ -19,6 +20,7 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
   final _address = TextEditingController();
   final _place = TextEditingController();
   final _pincode = TextEditingController();
+  final _mobile = TextEditingController();
   final _aadhar = TextEditingController();
   final _licence = TextEditingController();
   final _formKey = GlobalKey<FormState>();
@@ -30,6 +32,7 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
     _address.dispose();
     _place.dispose();
     _pincode.dispose();
+    _mobile.dispose();
     _aadhar.dispose();
     _licence.dispose();
     super.dispose();
@@ -43,6 +46,7 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
     _address.text = p.address ?? '';
     _place.text = p.place ?? '';
     _pincode.text = p.pincode ?? '';
+    _mobile.text = p.mobileNumber ?? '';
     _aadhar.text = p.aadharNumber ?? '';
     _licence.text = p.drivingLicenceNumber ?? '';
   }
@@ -68,9 +72,26 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
                       children: [
                         AppTextField(
                           controller: _name,
-                          label: 'Name',
+                          label: 'Name *',
                           hint: 'Full name',
                           validator: (v) => v == null || v.trim().isEmpty ? 'Required' : null,
+                        ),
+                        const SizedBox(height: 12),
+                        AppTextField(
+                          controller: _mobile,
+                          label: 'Mobile Number *',
+                          hint: 'Mobile number',
+                          keyboardType: TextInputType.number,
+                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                          maxLength: 10,
+                          validator: (v) {
+                            final value = v?.trim() ?? '';
+                            if (value.isEmpty) return 'Required';
+                            if (!RegExp(r'^\d{10}$').hasMatch(value)) {
+                              return 'Mobile number must be exactly 10 digits';
+                            }
+                            return null;
+                          },
                         ),
                         const SizedBox(height: 12),
                         AppTextField(
@@ -98,15 +119,26 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
                         const SizedBox(height: 12),
                         AppTextField(
                           controller: _aadhar,
-                          label: 'Aadhar Number',
+                          label: 'Aadhar Number *',
                           hint: 'Aadhar number',
                           keyboardType: TextInputType.number,
+                          inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                          maxLength: 16,
+                          validator: (v) {
+                            final value = v?.trim() ?? '';
+                            if (value.isEmpty) return 'Required';
+                            if (!RegExp(r'^\d{16}$').hasMatch(value)) {
+                              return 'Aadhar number must be exactly 16 digits';
+                            }
+                            return null;
+                          },
                         ),
                         const SizedBox(height: 12),
                         AppTextField(
                           controller: _licence,
-                          label: 'Driving Licence Number',
+                          label: 'Driving Licence Number *',
                           hint: 'Licence number',
+                          validator: (v) => v == null || v.trim().isEmpty ? 'Required' : null,
                         ),
                       ],
                     ),
@@ -133,8 +165,9 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
                                       address: _address.text.isEmpty ? null : _address.text,
                                       place: _place.text.isEmpty ? null : _place.text,
                                       pincode: _pincode.text.isEmpty ? null : _pincode.text,
-                                      aadharNumber: _aadhar.text.isEmpty ? null : _aadhar.text,
-                                      drivingLicenceNumber: _licence.text.isEmpty ? null : _licence.text,
+                                      mobileNumber: _mobile.text,
+                                      aadharNumber: _aadhar.text,
+                                      drivingLicenceNumber: _licence.text,
                                     );
                                   }
                                 },

@@ -49,6 +49,7 @@ class FirebaseDriverDatasource {
       address: profile.address,
       place: profile.place,
       pincode: profile.pincode,
+      mobileNumber: profile.mobileNumber,
       aadharNumber: profile.aadharNumber,
       drivingLicenceNumber: profile.drivingLicenceNumber,
       updatedAt: DateTime.now(),

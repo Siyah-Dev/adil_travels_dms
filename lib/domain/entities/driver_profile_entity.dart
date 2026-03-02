@@ -8,6 +8,7 @@ class DriverProfileEntity {
   final String? address;
   final String? place;
   final String? pincode;
+  final String? mobileNumber;
   final String? aadharNumber;
   final String? drivingLicenceNumber;
   final DateTime? updatedAt;
@@ -20,6 +21,7 @@ class DriverProfileEntity {
     this.address,
     this.place,
     this.pincode,
+    this.mobileNumber,
     this.aadharNumber,
     this.drivingLicenceNumber,
     this.updatedAt,

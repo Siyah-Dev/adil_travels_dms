@@ -18,6 +18,7 @@ class FirebaseConstants {
   static const String address = 'address';
   static const String place = 'place';
   static const String pincode = 'pincode';
+  static const String mobileNumber = 'mobileNumber';
   static const String aadharNumber = 'aadharNumber';
   static const String drivingLicenceNumber = 'drivingLicenceNumber';
 

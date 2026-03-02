@@ -31,7 +31,7 @@ class AuthController extends GetxController {
         final targetRoute = user.role == AppConstants.roleAdmin
             ? AppRoutes.adminHome
             : AppRoutes.driverHome;
-        _navigateIfNeeded(targetRoute);
+        _navigateToHomeIfOutOfScope(targetRoute);
       }
     });
   }
@@ -41,6 +41,32 @@ class AuthController extends GetxController {
       return;
     }
     Get.offAllNamed(route);
+  }
+
+  void _navigateToHomeIfOutOfScope(String homeRoute) {
+    final current = Get.currentRoute;
+    final isAuthRoute = current == AppRoutes.roleSelection ||
+        current == AppRoutes.login ||
+        current == AppRoutes.register ||
+        current.isEmpty;
+
+    final inDriverArea = current.startsWith('/driver/');
+    final inAdminArea = current.startsWith('/admin/');
+
+    if (homeRoute == AppRoutes.driverHome) {
+      if (inDriverArea) return;
+      if (isAuthRoute || inAdminArea) {
+        _navigateIfNeeded(homeRoute);
+      }
+      return;
+    }
+
+    if (homeRoute == AppRoutes.adminHome) {
+      if (inAdminArea) return;
+      if (isAuthRoute || inDriverArea) {
+        _navigateIfNeeded(homeRoute);
+      }
+    }
   }
 
   Future<void> signIn(String email, String password) async {

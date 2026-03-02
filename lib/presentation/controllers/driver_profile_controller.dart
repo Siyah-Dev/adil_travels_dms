@@ -34,8 +34,9 @@ class DriverProfileController extends GetxController {
     String? address,
     String? place,
     String? pincode,
-    String? aadharNumber,
-    String? drivingLicenceNumber,
+    required String mobileNumber,
+    required String aadharNumber,
+    required String drivingLicenceNumber,
   }) async {
     isLoading.value = true;
     try {
@@ -48,8 +49,9 @@ class DriverProfileController extends GetxController {
         address: address?.trim(),
         place: place?.trim(),
         pincode: pincode?.trim(),
-        aadharNumber: aadharNumber?.trim(),
-        drivingLicenceNumber: drivingLicenceNumber?.trim(),
+        mobileNumber: mobileNumber.trim(),
+        aadharNumber: aadharNumber.trim(),
+        drivingLicenceNumber: drivingLicenceNumber.trim(),
         updatedAt: DateTime.now(),
       );
       await _repo.saveDriverProfile(entity);
