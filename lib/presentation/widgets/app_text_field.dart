@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 /// Reusable text field.
 /// Paste in: lib/presentation/widgets/app_text_field.dart
@@ -19,6 +20,8 @@ class AppTextField extends StatefulWidget {
     this.enableObscureToggle = false,
     this.readOnly = false,
     this.onTap,
+    this.maxLength,
+    this.inputFormatters,
   });
 
   final TextEditingController? controller;
@@ -35,6 +38,8 @@ class AppTextField extends StatefulWidget {
   final bool enableObscureToggle;
   final bool readOnly;
   final VoidCallback? onTap;
+  final int? maxLength;
+  final List<TextInputFormatter>? inputFormatters;
 
   @override
   State<AppTextField> createState() => _AppTextFieldState();
@@ -77,6 +82,8 @@ class _AppTextFieldState extends State<AppTextField> {
       enabled: widget.enabled,
       readOnly: widget.readOnly,
       onTap: widget.onTap,
+      maxLength: widget.maxLength,
+      inputFormatters: widget.inputFormatters,
     );
   }
 }
