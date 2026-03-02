@@ -8,8 +8,12 @@ class DriverProfileEntity {
   final String? address;
   final String? place;
   final String? pincode;
+  final String? mobileNumber;
   final String? aadharNumber;
   final String? drivingLicenceNumber;
+  final String? profileImagePath;
+  final String? aadharImagePath;
+  final String? drivingLicenceImagePath;
   final DateTime? updatedAt;
 
   const DriverProfileEntity({
@@ -20,8 +24,12 @@ class DriverProfileEntity {
     this.address,
     this.place,
     this.pincode,
+    this.mobileNumber,
     this.aadharNumber,
     this.drivingLicenceNumber,
+    this.profileImagePath,
+    this.aadharImagePath,
+    this.drivingLicenceImagePath,
     this.updatedAt,
   });
 }
