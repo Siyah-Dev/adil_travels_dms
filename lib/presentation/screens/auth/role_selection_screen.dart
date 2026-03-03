@@ -21,11 +21,6 @@ class RoleSelectionScreen extends StatelessWidget {
               children: [
                 Container(
                   padding: const EdgeInsets.all(12),
-                  decoration: BoxDecoration(
-                    // color: Colors.white,
-                    // borderRadius: BorderRadius.circular(20),
-                    // border: Border.all(color: AppTheme.accentColor, width: 2),
-                  ),
                   child: Image.asset(
                     AppConstants.logoAsset,
                     height: 180,
@@ -33,14 +28,6 @@ class RoleSelectionScreen extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(height: 20),
-                // Text(
-                //   AppConstants.appName,
-                //   textAlign: TextAlign.center,
-                //   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                //     color: AppTheme.primaryColor,
-                //     fontWeight: FontWeight.bold,
-                //   ),
-                // ),
                 const SizedBox(height: 40),
                 ElevatedButton.icon(
                   onPressed: () => Get.toNamed(AppRoutes.login),

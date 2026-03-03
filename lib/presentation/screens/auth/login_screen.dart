@@ -42,6 +42,7 @@ class LoginScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final auth = Get.find<AuthController>();
     return Scaffold(
       appBar: AppBar(
         title: const Text('Login'),
@@ -50,93 +51,97 @@ class LoginScreen extends StatelessWidget {
           onPressed: () => Get.back(),
         ),
       ),
-      body: GetBuilder<AuthController>(
-        builder: (auth) {
-          return SingleChildScrollView(
-            padding: const EdgeInsets.all(24),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 8),
-                  Center(
-                    child: Image.asset(
-                      AppConstants.logoAsset,
-                      height: 120,
-                      fit: BoxFit.contain,
-                    ),
+      body: Obx(
+        () => SingleChildScrollView(
+          padding: const EdgeInsets.all(24),
+          child: Form(
+            key: _formKey,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                const SizedBox(height: 8),
+                Center(
+                  child: Image.asset(
+                    AppConstants.logoAsset,
+                    height: 120,
+                    fit: BoxFit.contain,
                   ),
-                  const SizedBox(height: 20),
-                  AppTextField(
-                    controller: _email,
-                    label: 'Email',
-                    hint: 'Enter email',
-                    keyboardType: TextInputType.emailAddress,
-                    validator: (v) =>
-                        v == null || v.isEmpty ? 'Required' : null,
-                  ),
-                  const SizedBox(height: 16),
-                  AppTextField(
-                    controller: _password,
-                    label: 'Password',
-                    hint: 'Enter password',
-                    obscureText: true,
-                    enableObscureToggle: true,
-                    validator: (v) =>
-                        v == null || v.isEmpty ? 'Required' : null,
-                  ),
-                  Align(
-                    alignment: Alignment.centerRight,
-                    child: TextButton(
-                      onPressed: auth.isLoading.value
-                          ? null
-                          : () => _showForgotPasswordDialog(auth),
-                      child: const Text('Forgot password?'),
-                    ),
-                  ),
-                  if (auth.error.value.isNotEmpty) ...[
-                    const SizedBox(height: 12),
-                    Text(
-                      auth.error.value,
-                      style: TextStyle(
-                        color: Theme.of(context).colorScheme.error,
-                      ),
-                    ),
-                  ],
-                  const SizedBox(height: 24),
-                  ElevatedButton(
+                ),
+                const SizedBox(height: 20),
+                AppTextField(
+                  controller: _email,
+                  label: 'Email',
+                  hint: 'Enter email',
+                  keyboardType: TextInputType.emailAddress,
+                  onChanged: (_) {
+                    if (auth.error.value.isNotEmpty) auth.error.value = '';
+                  },
+                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                ),
+                const SizedBox(height: 16),
+                AppTextField(
+                  controller: _password,
+                  label: 'Password',
+                  hint: 'Enter password',
+                  obscureText: true,
+                  enableObscureToggle: true,
+                  onChanged: (_) {
+                    if (auth.error.value.isNotEmpty) auth.error.value = '';
+                  },
+                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                ),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
                     onPressed: auth.isLoading.value
                         ? null
-                        : () {
-                            if (_formKey.currentState?.validate() ?? false) {
-                              auth.signIn(_email.text.trim(), _password.text);
-                            }
-                          },
-                    style: ElevatedButton.styleFrom(
-                      minimumSize: const Size(0, 48),
-                    ),
-                    child: auth.isLoading.value
-                        ? const SizedBox(
-                            height: 24,
-                            width: 24,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          )
-                        : const Text('Login'),
+                        : () => _showForgotPasswordDialog(auth),
+                    child: const Text('Forgot password?'),
                   ),
-                  const SizedBox(height: 16),
-                  TextButton(
-                    onPressed: () {
-                      _resetFormState(auth);
-                      Get.toNamed(AppRoutes.register);
-                    },
-                    child: const Text('Create account (Driver)'),
+                ),
+                if (auth.error.value.isNotEmpty) ...[
+                  const SizedBox(height: 12),
+                  Text(
+                    auth.error.value,
+                    style: TextStyle(
+                      color: Theme.of(context).colorScheme.error,
+                    ),
                   ),
                 ],
-              ),
+                const SizedBox(height: 24),
+                ElevatedButton(
+                  onPressed: auth.isLoading.value
+                      ? null
+                      : () {
+                          if (_formKey.currentState?.validate() ?? false) {
+                            auth.signIn(_email.text.trim(), _password.text);
+                          }
+                        },
+                  style: ElevatedButton.styleFrom(
+                    minimumSize: const Size(0, 48),
+                  ),
+                  child: auth.isLoading.value
+                      ? const SizedBox(
+                          height: 24,
+                          width: 24,
+                          child: CircularProgressIndicator(strokeWidth: 2),
+                        )
+                      : const Text('Login'),
+                ),
+                const SizedBox(height: 16),
+                TextButton(
+                  onPressed: auth.isLoading.value
+                      ? null
+                      : () {
+                          _resetFormState(auth);
+                          Get.toNamed(AppRoutes.register);
+                        },
+                  child: const Text('Create account (Driver)'),
+                ),
+              ],
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }
