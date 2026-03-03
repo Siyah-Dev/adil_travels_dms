@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import '../../../core/routes/app_pages.dart';
+import '../../../core/services/supabase_storage_service.dart';
 import '../../../core/utils/app_dialogs.dart';
 import '../../../domain/entities/driver_profile_entity.dart';
 import '../../controllers/admin_driver_list_controller.dart';
@@ -35,8 +36,10 @@ class DriverListScreen extends StatelessWidget {
                         itemCount: ctrl.filteredDrivers.length,
                         itemBuilder: (_, i) {
                           final d = ctrl.filteredDrivers[i];
+                          final todayVehicle = ctrl.todayVehicleByDriver[d.userId];
                           return _DriverTile(
                             driver: d,
+                            todayVehicleNumber: todayVehicle,
                             onTap: () => Get.toNamed(
                               AppRoutes.adminDriverDetail,
                               arguments: d.userId,
@@ -66,6 +69,7 @@ class DriverListScreen extends StatelessWidget {
 class _DriverTile extends StatelessWidget {
   const _DriverTile({
     required this.driver,
+    required this.todayVehicleNumber,
     required this.onTap,
     required this.onDelete,
     required this.onSuspend,
@@ -73,6 +77,7 @@ class _DriverTile extends StatelessWidget {
   });
 
   final DriverProfileEntity driver;
+  final String? todayVehicleNumber;
   final VoidCallback onTap;
   final VoidCallback onDelete;
   final VoidCallback onSuspend;
@@ -80,30 +85,85 @@ class _DriverTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final mobile = driver.mobileNumber?.trim() ?? '';
+    final hasMobile = mobile.isNotEmpty;
+    final vehicleNumber = todayVehicleNumber?.trim() ?? '';
+
     return ListTile(
-      leading: const CircleAvatar(child: Icon(Icons.person)),
+      leading: _DriverAvatar(imagePath: driver.profileImagePath),
       title: Text(driver.name),
-      subtitle: Text(driver.place ?? driver.address ?? ''),
-      trailing: PopupMenuButton<String>(
-        onSelected: (v) {
-          if (v == 'detail') {
-            onTap();
-          } else if (v == 'delete') {
-            onDelete();
-          } else if (v == 'suspend') {
-            onSuspend();
-          } else if (v == 'activate') {
-            onActivate();
-          }
-        },
-        itemBuilder: (_) => [
-          const PopupMenuItem(value: 'detail', child: Text('View profile')),
-          const PopupMenuItem(value: 'suspend', child: Text('Suspend')),
-          const PopupMenuItem(value: 'activate', child: Text('Activate')),
-          const PopupMenuItem(value: 'delete', child: Text('Delete')),
+      subtitle: Text(hasMobile ? mobile : 'Mobile number not available'),
+      trailing: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Text(
+            vehicleNumber.isEmpty ? '-' : vehicleNumber,
+            style: Theme.of(context).textTheme.bodyMedium,
+          ),
+          PopupMenuButton<String>(
+            onSelected: (v) {
+              if (v == 'detail') {
+                onTap();
+              } else if (v == 'delete') {
+                onDelete();
+              } else if (v == 'suspend') {
+                onSuspend();
+              } else if (v == 'activate') {
+                onActivate();
+              }
+            },
+            itemBuilder: (_) => [
+              const PopupMenuItem(value: 'detail', child: Text('View profile')),
+              const PopupMenuItem(value: 'suspend', child: Text('Suspend')),
+              const PopupMenuItem(value: 'activate', child: Text('Activate')),
+              const PopupMenuItem(value: 'delete', child: Text('Delete')),
+            ],
+          ),
         ],
       ),
       onTap: onTap,
+    );
+  }
+}
+
+class _DriverAvatar extends StatelessWidget {
+  const _DriverAvatar({required this.imagePath});
+
+  final String? imagePath;
+
+  Future<String?> _loadImageUrl() async {
+    if (imagePath == null || imagePath!.trim().isEmpty) return null;
+    try {
+      return await SupabaseStorageService.createSignedUrl(imagePath!);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (imagePath == null || imagePath!.trim().isEmpty) {
+      return const CircleAvatar(child: Icon(Icons.person));
+    }
+
+    return FutureBuilder<String?>(
+      future: _loadImageUrl(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircleAvatar(
+            child: SizedBox(
+              width: 16,
+              height: 16,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          );
+        }
+        final url = snapshot.data;
+        if (url == null || url.isEmpty) {
+          return const CircleAvatar(child: Icon(Icons.person));
+        }
+        return CircleAvatar(backgroundImage: NetworkImage(url));
+      },
     );
   }
 }

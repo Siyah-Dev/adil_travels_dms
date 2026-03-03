@@ -39,27 +39,26 @@ class DriverDetailScreen extends StatelessWidget {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
+                      Center(
+                        child: _DriverProfileAvatar(path: d.profileImagePath),
+                      ),
+                      const SizedBox(height: 16),
                       _ProfileRow('Name', d.name),
+                      _ProfileRow('Mobile Number', _displayValue(d.mobileNumber)),
+                      _ProfileRow('Address', _displayValue(d.address)),
+                      _ProfileRow('Pincode', _displayValue(d.pincode)),
+                      _ProfileRow('Aadhar Number', _displayValue(d.aadharNumber)),
+                      _ProfileRow('Licence Number', _displayValue(d.drivingLicenceNumber)),
                       if (d.age != null) _ProfileRow('Age', d.age.toString()),
-                      if (d.address != null) _ProfileRow('Address', d.address!),
-                      if (d.place != null) _ProfileRow('Place', d.place!),
-                      if (d.pincode != null) _ProfileRow('Pincode', d.pincode!),
-                      if (d.aadharNumber != null) _ProfileRow('Aadhar', d.aadharNumber!),
-                      if (d.drivingLicenceNumber != null) _ProfileRow('Licence', d.drivingLicenceNumber!),
-                      if (d.mobileNumber != null) _ProfileRow('Mobile', d.mobileNumber!),
+                      if ((d.place ?? '').trim().isNotEmpty) _ProfileRow('Place', d.place!.trim()),
                       const SizedBox(height: 12),
                       _DriverDocImage(
-                        title: 'Profile Picture',
-                        path: d.profileImagePath,
-                      ),
-                      const SizedBox(height: 10),
-                      _DriverDocImage(
-                        title: 'Aadhar Picture',
+                        title: 'Aadhar Image',
                         path: d.aadharImagePath,
                       ),
                       const SizedBox(height: 10),
                       _DriverDocImage(
-                        title: 'Driving Licence Picture',
+                        title: 'Licence Image',
                         path: d.drivingLicenceImagePath,
                       ),
                     ],
@@ -92,6 +91,11 @@ class DriverDetailScreen extends StatelessWidget {
       ),
     );
   }
+}
+
+String _displayValue(String? value) {
+  final v = value?.trim() ?? '';
+  return v.isEmpty ? '-' : v;
 }
 
 class _ProfileRow extends StatelessWidget {
@@ -132,6 +136,52 @@ class _EntryTile extends StatelessWidget {
   }
 }
 
+class _DriverProfileAvatar extends StatelessWidget {
+  const _DriverProfileAvatar({required this.path});
+
+  final String? path;
+
+  @override
+  Widget build(BuildContext context) {
+    final p = path?.trim() ?? '';
+    if (p.isEmpty) {
+      return const CircleAvatar(
+        radius: 46,
+        child: Icon(Icons.person, size: 36),
+      );
+    }
+
+    return FutureBuilder<String>(
+      future: SupabaseStorageService.createSignedUrl(p),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const CircleAvatar(
+            radius: 46,
+            child: SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(strokeWidth: 2),
+            ),
+          );
+        }
+
+        final url = snapshot.data ?? '';
+        if (url.isEmpty) {
+          return const CircleAvatar(
+            radius: 46,
+            child: Icon(Icons.person, size: 36),
+          );
+        }
+
+        return CircleAvatar(
+          radius: 46,
+          backgroundImage: NetworkImage(url),
+        );
+      },
+    );
+  }
+}
+
 class _DriverDocImage extends StatelessWidget {
   const _DriverDocImage({
     required this.title,
@@ -153,7 +203,7 @@ class _DriverDocImage extends StatelessWidget {
               ),
         ),
         const SizedBox(height: 6),
-        if (path == null || path!.isEmpty)
+        if (path == null || path!.trim().isEmpty)
           const Text('-')
         else
           FutureBuilder<String>(
@@ -168,13 +218,44 @@ class _DriverDocImage extends StatelessWidget {
               if (!snapshot.hasData || snapshot.data!.isEmpty) {
                 return const Text('Could not load image');
               }
-              return ClipRRect(
+              final imageUrl = snapshot.data!;
+              return InkWell(
                 borderRadius: BorderRadius.circular(8),
-                child: Image.network(
-                  snapshot.data!,
-                  height: 140,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
+                onTap: () {
+                  showDialog<void>(
+                    context: context,
+                    builder: (_) => Dialog(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Align(
+                            alignment: Alignment.centerRight,
+                            child: IconButton(
+                              onPressed: () => Get.back<void>(),
+                              icon: const Icon(Icons.close),
+                            ),
+                          ),
+                          Flexible(
+                            child: InteractiveViewer(
+                              child: Image.network(
+                                imageUrl,
+                                fit: BoxFit.contain,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  );
+                },
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: Image.network(
+                    imageUrl,
+                    height: 84,
+                    width: 84,
+                    fit: BoxFit.cover,
+                  ),
                 ),
               );
             },

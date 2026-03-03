@@ -1,0 +1,15 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Flutter",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "toolArgs": [
+        "--dart-define=SUPABASE_URL=https://agnntanzguifeporkvaw.supabase.co",
+        "--dart-define=SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnbm50YW56Z3VpZmVwb3JrdmF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0NDEzNTgsImV4cCI6MjA4ODAxNzM1OH0.pxiXNd9vlo13XEMVZwgXwukLtPrQsT3eGjjEA_ppEdA"
+      ]
+    }
+  ]
+}
