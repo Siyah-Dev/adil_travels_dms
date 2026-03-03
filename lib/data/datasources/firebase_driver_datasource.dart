@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/constants/firebase_constants.dart';
 import '../../domain/entities/driver_profile_entity.dart';
@@ -16,7 +15,6 @@ import '../models/vehicle_model.dart';
 /// Paste in: lib/data/datasources/firebase_driver_datasource.dart
 class FirebaseDriverDatasource {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
-  final FirebaseAuth _auth = FirebaseAuth.instance;
 
   // Drivers subcollection under users, or separate collection
   String get _driversPath => AppConstants.driversCollection;
@@ -340,33 +338,21 @@ class FirebaseDriverDatasource {
 
   // --- Helpline numbers
   Future<HelplineNumbersEntity?> getHelplineNumbers() async {
-    try {
-      final doc = await _firestore.collection(_helplinePath).doc('admin').get();
-      if (!doc.exists) return null;
-      final data = doc.data() ?? <String, dynamic>{};
-      return _helplineFromMap(data);
-    } on FirebaseException catch (e) {
-      if (e.code != 'permission-denied') rethrow;
-      final fallback = await _getHelplineFromUserDoc();
-      return fallback;
-    }
+    final doc = await _firestore.collection(_helplinePath).doc('admin').get();
+    if (!doc.exists) return null;
+    final data = doc.data() ?? <String, dynamic>{};
+    return _helplineFromMap(data);
   }
 
   Future<void> saveHelplineNumbers(HelplineNumbersEntity helplineNumbers) async {
     final payload = _helplineToMap(helplineNumbers);
-
-    try {
-      await _firestore.collection(_helplinePath).doc('admin').set(
-        <String, dynamic>{
-          ...payload,
-          'updatedAt': FieldValue.serverTimestamp(),
-        },
-        SetOptions(merge: true),
-      );
-    } on FirebaseException catch (e) {
-      if (e.code != 'permission-denied') rethrow;
-      await _saveHelplineInUserDoc(helplineNumbers);
-    }
+    await _firestore.collection(_helplinePath).doc('admin').set(
+      <String, dynamic>{
+        ...payload,
+        'updatedAt': FieldValue.serverTimestamp(),
+      },
+      SetOptions(merge: true),
+    );
   }
 
   HelplineNumbersEntity _helplineFromMap(Map<String, dynamic> data) {
@@ -404,39 +390,5 @@ class FirebaseDriverDatasource {
       FirebaseConstants.officeNumber: helplineNumbers.officeNumber.trim(),
       FirebaseConstants.contacts: contacts,
     };
-  }
-
-  Future<HelplineNumbersEntity?> _getHelplineFromUserDoc() async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null || uid.isEmpty) return null;
-
-    final doc = await _firestore.collection(AppConstants.usersCollection).doc(uid).get();
-    if (!doc.exists) return null;
-
-    final data = doc.data() ?? <String, dynamic>{};
-    final map = data['helplineNumbers'] as Map<String, dynamic>?;
-    if (map == null) return null;
-    return _helplineFromMap(map);
-  }
-
-  Future<void> _saveHelplineInUserDoc(HelplineNumbersEntity helplineNumbers) async {
-    final uid = _auth.currentUser?.uid;
-    if (uid == null || uid.isEmpty) {
-      throw FirebaseException(
-        plugin: 'cloud_firestore',
-        code: 'permission-denied',
-        message: 'No authenticated admin user found for fallback helpline storage.',
-      );
-    }
-
-    await _firestore.collection(AppConstants.usersCollection).doc(uid).set(
-      <String, dynamic>{
-        'helplineNumbers': <String, dynamic>{
-          ..._helplineToMap(helplineNumbers),
-          'updatedAt': FieldValue.serverTimestamp(),
-        },
-      },
-      SetOptions(merge: true),
-    );
   }
 }

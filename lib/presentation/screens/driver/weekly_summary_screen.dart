@@ -22,6 +22,16 @@ class _DriverWeeklySummaryScreenState extends State<DriverWeeklySummaryScreen> {
   DateTime? _day;
   bool _isDailyFilter = false;
 
+  DateTime _dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
+
+  DateTime _startOfWeek(DateTime date) {
+    final d = _dateOnly(date);
+    return d.subtract(Duration(days: d.weekday - DateTime.monday));
+  }
+
+  DateTime _endOfWeek(DateTime weekStart) =>
+      _dateOnly(weekStart).add(const Duration(days: 6));
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -104,11 +114,10 @@ class _DriverWeeklySummaryScreenState extends State<DriverWeeklySummaryScreen> {
                                 lastDate: now,
                               );
                               if (d != null) {
+                                final ws = _startOfWeek(d);
                                 setState(() {
-                                  _start = d;
-                                  if (_end != null && _end!.isBefore(d)) {
-                                    _end = null;
-                                  }
+                                  _start = ws;
+                                  _end = _endOfWeek(ws);
                                 });
                               }
                             },
@@ -119,34 +128,7 @@ class _DriverWeeklySummaryScreenState extends State<DriverWeeklySummaryScreen> {
                         ListTile(
                           title: const Text('End Date'),
                           subtitle: Text(
-                            _end == null ? 'Select' : DateFormat.yMMMd().format(_end!),
-                          ),
-                          trailing: IconButton(
-                            onPressed: () async {
-                              final now = DateTime.now();
-                              var initialDate = _end ?? _start ?? now;
-                              if (initialDate.isAfter(now)) {
-                                initialDate = now;
-                              }
-                              final d = await showDatePicker(
-                                context: context,
-                                initialDate: initialDate,
-                                firstDate: DateTime(2020),
-                                lastDate: now,
-                              );
-                              if (d != null) {
-                                if (_start != null && d.isBefore(_start!)) {
-                                  ErrorHandler.showInfo(
-                                    'End date cannot be before start date.',
-                                    title: 'Invalid end date',
-                                  );
-                                  return;
-                                }
-                                setState(() => _end = d);
-                              }
-                            },
-                            tooltip: 'Pick end date',
-                            icon: const Icon(Icons.calendar_month_outlined),
+                            _end == null ? '- - -' : DateFormat.yMMMd().format(_end!),
                           ),
                         ),
                       ],
@@ -165,12 +147,16 @@ class _DriverWeeklySummaryScreenState extends State<DriverWeeklySummaryScreen> {
                           }
 
                           if (_start == null || _end == null) {
-                            ErrorHandler.showInfo(
-                              'Please pick start and end date.',
-                              title: 'Select dates',
-                            );
+                            ErrorHandler.showInfo('Please pick start date.', title: 'Select date');
                             return;
                           }
+
+                          final ws = _startOfWeek(_start!);
+                          final we = _endOfWeek(ws);
+                          setState(() {
+                            _start = ws;
+                            _end = we;
+                          });
 
                           ctrl.loadSummary(start: _start, end: _end);
                         },

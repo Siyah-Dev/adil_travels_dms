@@ -91,6 +91,13 @@ class DriverHomeScreen extends StatelessWidget {
                   margin: const EdgeInsets.only(top: 12),
                   onTap: () => Get.toNamed(AppRoutes.driverContacts),
                 ),
+                NavigationMenuTile(
+                  icon: Icons.support_agent,
+                  title: 'Helpline Numbers',
+                  subtitle: 'Call office or emergency contacts',
+                  margin: const EdgeInsets.only(top: 12),
+                  onTap: () => Get.toNamed(AppRoutes.driverHelplines),
+                ),
               ],
             ),
           );

@@ -11,6 +11,7 @@ import '../../presentation/screens/driver/driver_profile_screen.dart';
 import '../../presentation/screens/driver/daily_entry_screen.dart';
 import '../../presentation/screens/driver/weekly_summary_screen.dart';
 import '../../presentation/screens/driver/driver_contacts_screen.dart';
+import '../../presentation/screens/driver/driver_helpline_screen.dart';
 import '../../presentation/screens/admin/admin_home_screen.dart';
 import '../../presentation/screens/admin/driver_list_screen.dart';
 import '../../presentation/screens/admin/driver_detail_screen.dart';
@@ -33,6 +34,7 @@ abstract class AppRoutes {
   static const dailyEntry = '/driver/daily-entry';
   static const driverWeeklySummary = '/driver/weekly-summary';
   static const driverContacts = '/driver/contacts';
+  static const driverHelplines = '/driver/helplines';
   static const adminHome = '/admin/home';
   static const adminDriverList = '/admin/drivers';
   static const adminDriverDetail = '/admin/driver-detail';
@@ -89,6 +91,11 @@ class AppPages {
     GetPage(
       name: AppRoutes.driverContacts,
       page: () => const DriverContactsScreen(),
+      binding: DriverBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.driverHelplines,
+      page: () => const DriverHelplineScreen(),
       binding: DriverBinding(),
     ),
     GetPage(

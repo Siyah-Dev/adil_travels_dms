@@ -22,6 +22,16 @@ class _WeeklySummaryReportScreenState extends State<WeeklySummaryReportScreen> {
   DateTime? _start;
   DateTime? _end;
 
+  DateTime _dateOnly(DateTime d) => DateTime(d.year, d.month, d.day);
+
+  DateTime _startOfWeek(DateTime date) {
+    final d = _dateOnly(date);
+    return d.subtract(Duration(days: d.weekday - DateTime.monday));
+  }
+
+  DateTime _endOfWeek(DateTime weekStart) =>
+      _dateOnly(weekStart).add(const Duration(days: 6));
+
   @override
   void initState() {
     super.initState();
@@ -31,8 +41,8 @@ class _WeeklySummaryReportScreenState extends State<WeeklySummaryReportScreen> {
       final endArg = args['end'] as DateTime?;
       if (startArg != null && endArg != null) {
         _filterType = SummaryFilterType.weekly;
-        _start = startArg;
-        _end = endArg;
+        _start = _startOfWeek(startArg);
+        _end = _endOfWeek(_start!);
       } else if (startArg != null) {
         _dailyDate = startArg;
       }
@@ -44,11 +54,13 @@ class _WeeklySummaryReportScreenState extends State<WeeklySummaryReportScreen> {
       final day = DateTime(_dailyDate.year, _dailyDate.month, _dailyDate.day);
       await ctrl.loadSummary(start: day, end: day);
       return;
-    } else if (_start != null && _end != null) {
+    } else if (_start != null) {
+      _start = _startOfWeek(_start!);
+      _end = _endOfWeek(_start!);
       await ctrl.loadSummary(start: _start!, end: _end!);
       return;
     }
-    ErrorHandler.showInfo('Please pick start and end date.', title: 'Select dates');
+    ErrorHandler.showInfo('Please pick start date.', title: 'Select date');
   }
 
   @override
@@ -152,7 +164,13 @@ class _WeeklySummaryReportScreenState extends State<WeeklySummaryReportScreen> {
                                 firstDate: DateTime(2020),
                                 lastDate: DateTime.now(),
                               );
-                              if (d != null) setState(() => _start = d);
+                              if (d != null) {
+                                final ws = _startOfWeek(d);
+                                setState(() {
+                                  _start = ws;
+                                  _end = _endOfWeek(ws);
+                                });
+                              }
                             },
                             tooltip: 'Pick start date',
                             icon: const Icon(Icons.calendar_month_outlined),
@@ -163,19 +181,6 @@ class _WeeklySummaryReportScreenState extends State<WeeklySummaryReportScreen> {
                           subtitle: Text(_end == null
                               ? 'Select'
                               : DateFormat.yMMMd().format(_end!)),
-                          trailing: IconButton(
-                            onPressed: () async {
-                              final d = await showDatePicker(
-                                context: context,
-                                initialDate: _end ?? _start ?? DateTime.now(),
-                                firstDate: _start ?? DateTime(2020),
-                                lastDate: DateTime.now(),
-                              );
-                              if (d != null) setState(() => _end = d);
-                            },
-                            tooltip: 'Pick end date',
-                            icon: const Icon(Icons.calendar_month_outlined),
-                          ),
                         ),
                       ],
                       ElevatedButton(
