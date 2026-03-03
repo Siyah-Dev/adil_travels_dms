@@ -5,6 +5,7 @@ import '../../presentation/bindings/admin_binding.dart';
 import '../../presentation/screens/auth/login_screen.dart';
 import '../../presentation/screens/auth/register_screen.dart';
 import '../../presentation/screens/auth/role_selection_screen.dart';
+import '../../presentation/screens/auth/splash_screen.dart';
 import '../../presentation/screens/driver/driver_home_screen.dart';
 import '../../presentation/screens/driver/driver_profile_screen.dart';
 import '../../presentation/screens/driver/daily_entry_screen.dart';
@@ -23,6 +24,7 @@ import '../../presentation/screens/admin/helpline_numbers_screen.dart';
 /// Route names and page list.
 /// Paste in: lib/core/routes/app_pages.dart
 abstract class AppRoutes {
+  static const splash = '/splash';
   static const roleSelection = '/';
   static const login = '/login';
   static const register = '/register';
@@ -44,6 +46,11 @@ abstract class AppRoutes {
 
 class AppPages {
   static final routes = [
+    GetPage(
+      name: AppRoutes.splash,
+      page: () => const SplashScreen(),
+      binding: AuthBinding(),
+    ),
     GetPage(
       name: AppRoutes.roleSelection,
       page: () => const RoleSelectionScreen(),
