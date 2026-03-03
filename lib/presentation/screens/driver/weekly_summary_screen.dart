@@ -73,7 +73,9 @@ class _DriverWeeklySummaryScreenState extends State<DriverWeeklySummaryScreen> {
                         ListTile(
                           title: const Text('Date'),
                           subtitle: Text(
-                            _day == null ? 'Select' : DateFormat.yMMMd().format(_day!),
+                            _day == null
+                                ? 'Select'
+                                : DateFormat.yMMMd().format(_day!),
                           ),
                           trailing: IconButton(
                             onPressed: () async {
@@ -98,7 +100,9 @@ class _DriverWeeklySummaryScreenState extends State<DriverWeeklySummaryScreen> {
                         ListTile(
                           title: const Text('Start Date'),
                           subtitle: Text(
-                            _start == null ? 'Select' : DateFormat.yMMMd().format(_start!),
+                            _start == null
+                                ? 'Select'
+                                : DateFormat.yMMMd().format(_start!),
                           ),
                           trailing: IconButton(
                             onPressed: () async {
@@ -128,7 +132,9 @@ class _DriverWeeklySummaryScreenState extends State<DriverWeeklySummaryScreen> {
                         ListTile(
                           title: const Text('End Date'),
                           subtitle: Text(
-                            _end == null ? '- - -' : DateFormat.yMMMd().format(_end!),
+                            _end == null
+                                ? '- - -'
+                                : DateFormat.yMMMd().format(_end!),
                           ),
                         ),
                       ],
@@ -147,7 +153,10 @@ class _DriverWeeklySummaryScreenState extends State<DriverWeeklySummaryScreen> {
                           }
 
                           if (_start == null || _end == null) {
-                            ErrorHandler.showInfo('Please pick start date.', title: 'Select date');
+                            ErrorHandler.showInfo(
+                              'Please pick start date.',
+                              title: 'Select date',
+                            );
                             return;
                           }
 

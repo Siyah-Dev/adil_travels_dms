@@ -271,6 +271,14 @@ class PdfUtils {
     await Printing.layoutPdf(onLayout: (_) async => await file.readAsBytes());
   }
 
+  static Future<void> shareWeeklyBill(WeeklyStatusEntity s) async {
+    final file = await generateWeeklyBill(s);
+    await Printing.sharePdf(
+      bytes: await file.readAsBytes(),
+      filename: file.path.split(Platform.pathSeparator).last,
+    );
+  }
+
   static Future<void> previewDriverDailySummaryBill({
     required String driverName,
     required DateTime date,
