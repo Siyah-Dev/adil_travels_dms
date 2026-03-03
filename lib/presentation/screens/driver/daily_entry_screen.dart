@@ -73,6 +73,14 @@ class _DailyEntryScreenState extends State<DailyEntryScreen> {
     _servicesUsed = null;
   }
 
+  void _resetFormForDateChange() {
+    _filledFromEntry = false;
+    _forceLeaveOffUntilSave = false;
+    _leaveOnToday = false;
+    _leaveEnabledAt = null;
+    _clearNonEssentialFields();
+  }
+
   Future<void> _toggleLeave(DailyEntryController ctrl, bool enabled) async {
     if (enabled) {
       setState(() {
@@ -91,7 +99,7 @@ class _DailyEntryScreenState extends State<DailyEntryScreen> {
       _forceLeaveOffUntilSave = true;
     });
 
-    await ctrl.loadTodayEntry();
+    await ctrl.loadEntryForDate(_date);
 
     if (ctrl.todayEntry.value == null) {
       setState(() {
@@ -140,7 +148,6 @@ class _DailyEntryScreenState extends State<DailyEntryScreen> {
           effectiveLeave || e.servicesUsed == AppConstants.serviceLeave
           ? null
           : e.servicesUsed;
-      _date = e.date;
       _leaveOnToday = effectiveLeave;
       _leaveEnabledAt = effectiveLeave ? e.leaveEnabledAt : null;
     });
@@ -168,7 +175,7 @@ class _DailyEntryScreenState extends State<DailyEntryScreen> {
       body: GetX<DailyEntryController>(
         initState: (_) {
           final ctrl = Get.find<DailyEntryController>();
-          ctrl.loadTodayEntry();
+          ctrl.loadEntryForDate(_date);
           ctrl.loadVehicles();
           final name = Get.find<DriverProfileController>().profile.value?.name;
           if (name != null && name.isNotEmpty) _driverName.text = name;
@@ -195,7 +202,27 @@ class _DailyEntryScreenState extends State<DailyEntryScreen> {
                       children: [
                         ListTile(
                           title: const Text('Date'),
-                          subtitle: Text(DateFormat.yMMMd().format(_date)),
+                          subtitle: Align(
+                            alignment: Alignment.centerLeft,
+                            child: Container(
+                              margin: const EdgeInsets.only(top: 4),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 10,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.12),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                DateFormat.yMMMd().format(_date),
+                                style: TextStyle(
+                                  fontWeight: FontWeight.w700,
+                                  color: Theme.of(context).colorScheme.primary,
+                                ),
+                              ),
+                            ),
+                          ),
                           trailing: IconButton(
                             onPressed: () async {
                               final picked = await showDatePicker(
@@ -207,7 +234,11 @@ class _DailyEntryScreenState extends State<DailyEntryScreen> {
                                 ),
                               );
                               if (picked != null) {
-                                setState(() => _date = picked);
+                                setState(() {
+                                  _date = picked;
+                                  _resetFormForDateChange();
+                                });
+                                await entryCtrl.loadEntryForDate(picked);
                               }
                             },
                             tooltip: 'Pick date',

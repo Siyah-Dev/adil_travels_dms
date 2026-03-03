@@ -39,11 +39,17 @@ class DailyEntryController extends GetxController {
   }
 
   Future<void> loadTodayEntry() async {
+    await loadEntryForDate(DateTime.now());
+  }
+
+  Future<void> loadEntryForDate(DateTime date) async {
     isLoading.value = true;
     loadError.value = '';
+    // Clear stale entry immediately so UI doesn't render previous date values while loading.
+    todayEntry.value = null;
     try {
-      final date = DateTime.now();
-      final loaded = await _repo.getDailyEntry(userId, date);
+      final day = DateTime(date.year, date.month, date.day);
+      final loaded = await _repo.getDailyEntry(userId, day);
       if (loaded != null &&
           loaded.leaveOnToday &&
           loaded.leaveEnabledAt != null &&
@@ -82,7 +88,7 @@ class DailyEntryController extends GetxController {
         loadError.value =
             'Unable to load existing entry due to access permission. You can still fill the form and try saving.';
       } else {
-        loadError.value = 'Could not load today\'s entry: $msg';
+        loadError.value = 'Could not load entry: $msg';
       }
     } finally {
       isLoading.value = false;
