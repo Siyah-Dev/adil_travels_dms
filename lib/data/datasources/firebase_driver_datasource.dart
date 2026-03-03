@@ -179,10 +179,32 @@ class FirebaseDriverDatasource {
     Query<Map<String, dynamic>> q = _firestore.collection(_dailyPath).where('driverId', isEqualTo: driverId);
     if (start != null) q = q.where('date', isGreaterThanOrEqualTo: start);
     if (end != null) q = q.where('date', isLessThanOrEqualTo: end);
-    final snap = await q.get();
-    final entries = snap.docs.map((d) => DailyEntryModel.fromFirestore(d.data(), d.id)).toList();
-    entries.sort((a, b) => b.date.compareTo(a.date));
-    return entries;
+
+    try {
+      final snap = await q.get();
+      final entries = snap.docs.map((d) => DailyEntryModel.fromFirestore(d.data(), d.id)).toList();
+      entries.sort((a, b) => b.date.compareTo(a.date));
+      return entries;
+    } on FirebaseException catch (e) {
+      // Fallback when Firestore composite index is not configured for this range query.
+      if (e.code != 'failed-precondition') rethrow;
+
+      final baseSnap = await _firestore
+          .collection(_dailyPath)
+          .where('driverId', isEqualTo: driverId)
+          .get();
+
+      final baseEntries = baseSnap.docs.map((d) => DailyEntryModel.fromFirestore(d.data(), d.id)).toList();
+      final filtered = baseEntries.where((entry) {
+        final day = DateTime(entry.date.year, entry.date.month, entry.date.day);
+        final afterStart = start == null || !day.isBefore(DateTime(start.year, start.month, start.day));
+        final beforeEnd = end == null || !day.isAfter(DateTime(end.year, end.month, end.day));
+        return afterStart && beforeEnd;
+      }).toList();
+
+      filtered.sort((a, b) => b.date.compareTo(a.date));
+      return filtered;
+    }
   }
 
   Future<List<DailyEntryEntity>> getDailyEntriesByDate(DateTime date) async {
@@ -215,35 +237,100 @@ class FirebaseDriverDatasource {
 
   Future<WeeklyStatusEntity?> getWeeklyStatus(String driverId, DateTime weekStart) async {
     final start = DateTime(weekStart.year, weekStart.month, weekStart.day);
-    final q = await _firestore
-        .collection(_weeklyPath)
-        .where('driverId', isEqualTo: driverId)
-        .where('weekStartDate', isEqualTo: start)
-        .limit(1)
-        .get();
-    if (q.docs.isEmpty) return null;
-    final doc = q.docs.first;
-    return WeeklyStatusModel.fromFirestore(doc.data(), doc.id);
+    try {
+      final q = await _firestore
+          .collection(_weeklyPath)
+          .where('driverId', isEqualTo: driverId)
+          .where('weekStartDate', isEqualTo: start)
+          .limit(1)
+          .get();
+      if (q.docs.isEmpty) return null;
+      final doc = q.docs.first;
+      return WeeklyStatusModel.fromFirestore(doc.data(), doc.id);
+    } on FirebaseException catch (e) {
+      // Fallback when Firestore composite index is not configured.
+      if (e.code != 'failed-precondition') rethrow;
+
+      final base = await _firestore
+          .collection(_weeklyPath)
+          .where('driverId', isEqualTo: driverId)
+          .get();
+      for (final doc in base.docs) {
+        final status = WeeklyStatusModel.fromFirestore(doc.data(), doc.id);
+        final s = DateTime(
+          status.weekStartDate.year,
+          status.weekStartDate.month,
+          status.weekStartDate.day,
+        );
+        if (s == start) return status;
+      }
+      return null;
+    }
   }
 
   Future<List<WeeklyStatusEntity>> getWeeklyStatusesByDriver(String driverId, {DateTime? start, DateTime? end}) async {
     Query<Map<String, dynamic>> q = _firestore.collection(_weeklyPath).where('driverId', isEqualTo: driverId);
     if (start != null) q = q.where('weekStartDate', isGreaterThanOrEqualTo: start);
     if (end != null) q = q.where('weekStartDate', isLessThanOrEqualTo: end);
-    final snap = await q.get();
-    final statuses = snap.docs.map((d) => WeeklyStatusModel.fromFirestore(d.data(), d.id)).toList();
-    statuses.sort((a, b) => b.weekStartDate.compareTo(a.weekStartDate));
-    return statuses;
+
+    try {
+      final snap = await q.get();
+      final statuses = snap.docs.map((d) => WeeklyStatusModel.fromFirestore(d.data(), d.id)).toList();
+      statuses.sort((a, b) => b.weekStartDate.compareTo(a.weekStartDate));
+      return statuses;
+    } on FirebaseException catch (e) {
+      if (e.code != 'failed-precondition') rethrow;
+
+      final baseSnap = await _firestore
+          .collection(_weeklyPath)
+          .where('driverId', isEqualTo: driverId)
+          .get();
+      final base = baseSnap.docs.map((d) => WeeklyStatusModel.fromFirestore(d.data(), d.id)).toList();
+      final filtered = base.where((status) {
+        final day = DateTime(
+          status.weekStartDate.year,
+          status.weekStartDate.month,
+          status.weekStartDate.day,
+        );
+        final afterStart = start == null ||
+            !day.isBefore(DateTime(start.year, start.month, start.day));
+        final beforeEnd = end == null ||
+            !day.isAfter(DateTime(end.year, end.month, end.day));
+        return afterStart && beforeEnd;
+      }).toList();
+
+      filtered.sort((a, b) => b.weekStartDate.compareTo(a.weekStartDate));
+      return filtered;
+    }
   }
 
   Future<List<WeeklyStatusEntity>> getWeeklyStatusesInRange(DateTime start, DateTime end) async {
-    final snap = await _firestore
-        .collection(_weeklyPath)
-        .where('weekStartDate', isGreaterThanOrEqualTo: start)
-        .where('weekStartDate', isLessThanOrEqualTo: end)
-        .get();
-    final statuses = snap.docs.map((d) => WeeklyStatusModel.fromFirestore(d.data(), d.id)).toList();
-    statuses.sort((a, b) => a.weekStartDate.compareTo(b.weekStartDate));
-    return statuses;
+    try {
+      final snap = await _firestore
+          .collection(_weeklyPath)
+          .where('weekStartDate', isGreaterThanOrEqualTo: start)
+          .where('weekStartDate', isLessThanOrEqualTo: end)
+          .get();
+      final statuses = snap.docs.map((d) => WeeklyStatusModel.fromFirestore(d.data(), d.id)).toList();
+      statuses.sort((a, b) => a.weekStartDate.compareTo(b.weekStartDate));
+      return statuses;
+    } on FirebaseException catch (e) {
+      if (e.code != 'failed-precondition') rethrow;
+
+      final base = await _firestore.collection(_weeklyPath).get();
+      final statuses = base.docs
+          .map((d) => WeeklyStatusModel.fromFirestore(d.data(), d.id))
+          .where((status) {
+        final day = DateTime(
+          status.weekStartDate.year,
+          status.weekStartDate.month,
+          status.weekStartDate.day,
+        );
+        return !day.isBefore(DateTime(start.year, start.month, start.day)) &&
+            !day.isAfter(DateTime(end.year, end.month, end.day));
+      }).toList();
+      statuses.sort((a, b) => a.weekStartDate.compareTo(b.weekStartDate));
+      return statuses;
+    }
   }
 }

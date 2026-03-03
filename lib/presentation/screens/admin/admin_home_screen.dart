@@ -64,8 +64,8 @@ class AdminHomeScreen extends StatelessWidget {
           ),
           NavigationMenuTile(
             icon: Icons.date_range,
-            title: 'Weekly Status',
-            subtitle: 'Add and manage weekly status per driver',
+            title: 'Work Status',
+            subtitle: 'Add and manage daily/weekly status per driver',
             onTap: () => Get.toNamed(AppRoutes.adminWeeklyStatus),
           ),
           NavigationMenuTile(
