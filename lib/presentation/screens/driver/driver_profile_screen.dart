@@ -7,7 +7,6 @@ import '../../controllers/driver_profile_controller.dart';
 import '../../widgets/app_text_field.dart';
 import '../../widgets/section_card.dart';
 
-/// Paste in: lib/presentation/screens/driver/driver_profile_screen.dart
 class DriverProfileScreen extends StatefulWidget {
   const DriverProfileScreen({super.key});
 
@@ -40,17 +39,17 @@ class _DriverProfileScreenState extends State<DriverProfileScreen> {
     super.dispose();
   }
 
-  void _fillFromProfile(DriverProfileController ctrl) {
-    final p = ctrl.profile.value;
-    if (p == null) return;
-    _name.text = p.name;
-    _age.text = p.age?.toString() ?? '';
-    _address.text = p.address ?? '';
-    _place.text = p.place ?? '';
-    _pincode.text = p.pincode ?? '';
-    _mobile.text = p.mobileNumber ?? '';
-    _aadhar.text = p.aadharNumber ?? '';
-    _licence.text = p.drivingLicenceNumber ?? '';
+  void _fillFromProfile(DriverProfileController controller) {
+    final profile = controller.profile.value;
+    if (profile == null) return;
+    _name.text = profile.name;
+    _age.text = profile.age?.toString() ?? '';
+    _address.text = profile.address ?? '';
+    _place.text = profile.place ?? '';
+    _pincode.text = profile.pincode ?? '';
+    _mobile.text = profile.mobileNumber ?? '';
+    _aadhar.text = profile.aadharNumber ?? '';
+    _licence.text = profile.drivingLicenceNumber ?? '';
   }
 
   Future<void> _pickAndUpload({

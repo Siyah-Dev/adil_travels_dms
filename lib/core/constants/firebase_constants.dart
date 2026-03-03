@@ -56,4 +56,10 @@ class FirebaseConstants {
   static const String petrolExpense = 'petrolExpense';
   static const String pendingBalance = 'pendingBalance';
   static const String finalBalance = 'finalBalance';
+
+  // Helpline numbers
+  static const String officeNumber = 'officeNumber';
+  static const String contacts = 'contacts';
+  static const String contactName = 'contactName';
+  static const String contactNumber = 'contactNumber';
 }

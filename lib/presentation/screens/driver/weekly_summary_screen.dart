@@ -12,7 +12,8 @@ class DriverWeeklySummaryScreen extends StatefulWidget {
   const DriverWeeklySummaryScreen({super.key});
 
   @override
-  State<DriverWeeklySummaryScreen> createState() => _DriverWeeklySummaryScreenState();
+  State<DriverWeeklySummaryScreen> createState() =>
+      _DriverWeeklySummaryScreenState();
 }
 
 class _DriverWeeklySummaryScreenState extends State<DriverWeeklySummaryScreen> {
@@ -61,7 +62,9 @@ class _DriverWeeklySummaryScreenState extends State<DriverWeeklySummaryScreen> {
                       if (_isDailyFilter)
                         ListTile(
                           title: const Text('Date'),
-                          subtitle: Text(_day == null ? 'Select' : DateFormat.yMMMd().format(_day!)),
+                          subtitle: Text(
+                            _day == null ? 'Select' : DateFormat.yMMMd().format(_day!),
+                          ),
                           trailing: IconButton(
                             onPressed: () async {
                               final now = DateTime.now();
@@ -84,7 +87,9 @@ class _DriverWeeklySummaryScreenState extends State<DriverWeeklySummaryScreen> {
                       if (!_isDailyFilter) ...[
                         ListTile(
                           title: const Text('Start Date'),
-                          subtitle: Text(_start == null ? 'Select' : DateFormat.yMMMd().format(_start!)),
+                          subtitle: Text(
+                            _start == null ? 'Select' : DateFormat.yMMMd().format(_start!),
+                          ),
                           trailing: IconButton(
                             onPressed: () async {
                               final now = DateTime.now();
@@ -113,7 +118,9 @@ class _DriverWeeklySummaryScreenState extends State<DriverWeeklySummaryScreen> {
                         ),
                         ListTile(
                           title: const Text('End Date'),
-                          subtitle: Text(_end == null ? 'Select' : DateFormat.yMMMd().format(_end!)),
+                          subtitle: Text(
+                            _end == null ? 'Select' : DateFormat.yMMMd().format(_end!),
+                          ),
                           trailing: IconButton(
                             onPressed: () async {
                               final now = DateTime.now();
@@ -158,7 +165,10 @@ class _DriverWeeklySummaryScreenState extends State<DriverWeeklySummaryScreen> {
                           }
 
                           if (_start == null || _end == null) {
-                            ErrorHandler.showInfo('Please pick start and end date.', title: 'Select dates');
+                            ErrorHandler.showInfo(
+                              'Please pick start and end date.',
+                              title: 'Select dates',
+                            );
                             return;
                           }
 
@@ -171,23 +181,38 @@ class _DriverWeeklySummaryScreenState extends State<DriverWeeklySummaryScreen> {
                 ),
                 const SizedBox(height: 16),
                 if (ctrl.isLoading.value)
-                  const Center(child: Padding(padding: EdgeInsets.all(24), child: CircularProgressIndicator()))
+                  const Center(
+                    child: Padding(
+                      padding: EdgeInsets.all(24),
+                      child: CircularProgressIndicator(),
+                    ),
+                  )
                 else if (ctrl.list.isEmpty)
-                  const Card(child: Padding(padding: EdgeInsets.all(24), child: Text('No summary for this period.')))
+                  const Card(
+                    child: Padding(
+                      padding: EdgeInsets.all(24),
+                      child: Text('No summary for this period.'),
+                    ),
+                  )
                 else
-                  ...ctrl.list.map((s) => _SummaryCard(
-                        status: s,
-                        onDownload: () {
+                  ...ctrl.list.map(
+                    (s) => _SummaryCard(
+                      status: s,
+                      onDownload: () {
                         Future.microtask(() async {
                           try {
                             final file = await PdfUtils.generateWeeklyBill(s);
                             ErrorHandler.showSuccess('PDF saved: ${file.path}');
                           } catch (e) {
-                            ErrorHandler.showError(e, title: 'Could not create PDF');
+                            ErrorHandler.showError(
+                              e,
+                              title: 'Could not create PDF',
+                            );
                           }
                         });
                       },
-                      )),
+                    ),
+                  ),
               ],
             ),
           );
@@ -206,7 +231,8 @@ class _SummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SectionCard(
-      title: '${status.driverName} (${DateFormat.yMMMd().format(status.weekStartDate)} - ${DateFormat.yMMMd().format(status.weekEndDate)})',
+      title:
+          '${status.driverName} (${DateFormat.yMMMd().format(status.weekStartDate)} - ${DateFormat.yMMMd().format(status.weekEndDate)})',
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -248,8 +274,14 @@ class _Row extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(fontWeight: bold ? FontWeight.bold : null)),
-          Text('₹ ${value.toStringAsFixed(2)}', style: TextStyle(fontWeight: bold ? FontWeight.bold : null)),
+          Text(
+            label,
+            style: TextStyle(fontWeight: bold ? FontWeight.bold : null),
+          ),
+          Text(
+            '₹ ${value.toStringAsFixed(2)}',
+            style: TextStyle(fontWeight: bold ? FontWeight.bold : null),
+          ),
         ],
       ),
     );

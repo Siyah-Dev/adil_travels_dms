@@ -196,7 +196,7 @@ class _DailyEntryScreenState extends State<DailyEntryScreen> {
                         ListTile(
                           title: const Text('Date'),
                           subtitle: Text(DateFormat.yMMMd().format(_date)),
-                          trailing: TextButton(
+                          trailing: IconButton(
                             onPressed: () async {
                               final picked = await showDatePicker(
                                 context: context,
@@ -210,7 +210,8 @@ class _DailyEntryScreenState extends State<DailyEntryScreen> {
                                 setState(() => _date = picked);
                               }
                             },
-                            child: const Text('Change'),
+                            tooltip: 'Pick date',
+                            icon: const Icon(Icons.calendar_month_outlined),
                           ),
                         ),
                         AppTextField(

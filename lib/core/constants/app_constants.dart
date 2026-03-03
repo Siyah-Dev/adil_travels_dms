@@ -12,6 +12,7 @@ class AppConstants {
   static const String vehiclesCollection = 'vehicles';
   static const String dailyEntriesCollection = 'daily_entries';
   static const String weeklyStatusCollection = 'weekly_status';
+  static const String helplineNumbersCollection = 'helpline_numbers';
   static const String notificationsCollection = 'notifications';
 
   // User roles

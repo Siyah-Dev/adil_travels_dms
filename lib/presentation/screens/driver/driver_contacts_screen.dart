@@ -11,7 +11,10 @@ class DriverContactsScreen extends StatelessWidget {
   Future<void> _call(String? mobileNumber) async {
     final number = mobileNumber?.trim() ?? '';
     if (number.isEmpty) {
-      ErrorHandler.showInfo('Mobile number is not available.', title: 'Cannot call');
+      ErrorHandler.showInfo(
+        'Mobile number is not available.',
+        title: 'Cannot call',
+      );
       return;
     }
 
@@ -46,7 +49,10 @@ class DriverContactsScreen extends StatelessWidget {
               final driver = ctrl.drivers[i];
               return Card(
                 child: ListTile(
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  contentPadding: const EdgeInsets.symmetric(
+                    horizontal: 12,
+                    vertical: 6,
+                  ),
                   leading: _DriverAvatar(imagePath: driver.profileImagePath),
                   title: Text(
                     driver.name,
@@ -54,7 +60,8 @@ class DriverContactsScreen extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   subtitle: Text(
-                    (driver.mobileNumber == null || driver.mobileNumber!.trim().isEmpty)
+                    (driver.mobileNumber == null ||
+                            driver.mobileNumber!.trim().isEmpty)
                         ? 'Mobile Number not available'
                         : driver.mobileNumber!,
                     maxLines: 1,

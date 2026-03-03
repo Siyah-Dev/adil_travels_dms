@@ -1,5 +1,6 @@
 import 'package:get/get.dart';
 import '../../core/utils/error_handler.dart';
+import '../../domain/entities/daily_entry_entity.dart';
 import '../../domain/entities/driver_profile_entity.dart';
 import '../../domain/repositories/driver_repository.dart';
 
@@ -11,6 +12,7 @@ class AdminDriverListController extends GetxController {
 
   final RxList<DriverProfileEntity> drivers = <DriverProfileEntity>[].obs;
   final RxList<DriverProfileEntity> filteredDrivers = <DriverProfileEntity>[].obs;
+  final RxMap<String, DailyEntryEntity> todayEntryByDriver = <String, DailyEntryEntity>{}.obs;
   final RxBool isLoading = false.obs;
   final RxString searchQuery = ''.obs;
 
@@ -23,6 +25,7 @@ class AdminDriverListController extends GetxController {
         drivers.value = await _repo.searchDrivers(searchQuery.value);
       }
       filteredDrivers.value = List.from(drivers);
+      await _loadTodayVehicleNumbers();
     } catch (e) {
       ErrorHandler.showError(e, title: 'Could not load drivers');
     } finally {
@@ -58,4 +61,26 @@ class AdminDriverListController extends GetxController {
       ErrorHandler.showError(e, title: suspended ? 'Could not suspend driver' : 'Could not activate driver');
     }
   }
+
+  Future<void> _loadTodayVehicleNumbers() async {
+    try {
+      final today = DateTime.now();
+      final entries = await _repo.getDailyEntriesByDate(today);
+
+      final latestByDriver = <String, DailyEntryEntity>{};
+      for (final entry in entries) {
+        final existing = latestByDriver[entry.driverId];
+        if (existing == null ||
+            _entrySortTime(entry).isAfter(_entrySortTime(existing))) {
+          latestByDriver[entry.driverId] = entry;
+        }
+      }
+      todayEntryByDriver.assignAll(latestByDriver);
+    } catch (_) {
+      todayEntryByDriver.clear();
+    }
+  }
+
+  DateTime _entrySortTime(DailyEntryEntity entry) =>
+      entry.updatedAt ?? entry.createdAt ?? entry.date;
 }

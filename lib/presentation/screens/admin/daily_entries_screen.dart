@@ -25,7 +25,7 @@ class DailyEntriesScreen extends StatelessWidget {
                   children: [
                     Text(DateFormat.yMMMd().format(ctrl.selectedDate)),
                     const Spacer(),
-                    TextButton(
+                    IconButton(
                       onPressed: () async {
                         final d = await showDatePicker(
                           context: context,
@@ -35,7 +35,8 @@ class DailyEntriesScreen extends StatelessWidget {
                         );
                         if (d != null) ctrl.loadEntriesForDate(d);
                       },
-                      child: const Text('Change date'),
+                      tooltip: 'Pick date',
+                      icon: const Icon(Icons.calendar_month_outlined),
                     ),
                   ],
                 ),

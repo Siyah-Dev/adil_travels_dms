@@ -52,9 +52,9 @@ class DriverHomeScreen extends StatelessWidget {
           }
           final profile = profileCtrl.profile.value;
           final name = profile?.name ?? 'Driver';
-          final hasPhone =
-              profile?.mobileNumber != null && profile!.mobileNumber!.trim().isNotEmpty;
-          final phone = hasPhone ? profile.mobileNumber! : 'Mobile Number';
+          final mobile = profile?.mobileNumber?.trim();
+          final hasPhone = mobile != null && mobile.isNotEmpty;
+          final phone = hasPhone ? mobile : 'Mobile Number';
           final imagePath = profile?.profileImagePath;
           return SingleChildScrollView(
             padding: const EdgeInsets.all(16),

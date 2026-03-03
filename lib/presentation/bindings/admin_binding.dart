@@ -3,6 +3,7 @@ import '../../data/repositories/driver_repository_impl.dart';
 import '../controllers/admin_driver_list_controller.dart';
 import '../controllers/admin_driver_detail_controller.dart';
 import '../controllers/admin_daily_entries_controller.dart';
+import '../controllers/admin_helpline_controller.dart';
 import '../controllers/admin_weekly_status_controller.dart';
 import '../controllers/admin_weekly_summary_controller.dart';
 import '../controllers/admin_vehicle_controller.dart';
@@ -15,6 +16,7 @@ class AdminBinding extends Bindings {
     Get.lazyPut<AdminDriverListController>(() => AdminDriverListController(repo));
     Get.lazyPut<AdminDriverDetailController>(() => AdminDriverDetailController(repo));
     Get.lazyPut<AdminDailyEntriesController>(() => AdminDailyEntriesController(repo));
+    Get.lazyPut<AdminHelplineController>(() => AdminHelplineController(repo));
     Get.lazyPut<AdminWeeklyStatusController>(() => AdminWeeklyStatusController(repo));
     Get.lazyPut<AdminWeeklySummaryController>(() => AdminWeeklySummaryController(repo));
     Get.lazyPut<AdminVehicleController>(() => AdminVehicleController(repo));

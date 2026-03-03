@@ -19,10 +19,18 @@ Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage m) async {
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  const supabaseUrl = String.fromEnvironment('SUPABASE_URL');
+  const supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
+
+  if (supabaseUrl.isEmpty || supabaseAnonKey.isEmpty) {
+    throw Exception(
+      'Supabase config missing. Pass --dart-define=SUPABASE_URL and --dart-define=SUPABASE_ANON_KEY.',
+    );
+  }
+
   await Supabase.initialize(
-    url: 'https://agnntanzguifeporkvaw.supabase.co',
-    anonKey:
-        'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnbm50YW56Z3VpZmVwb3JrdmF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0NDEzNTgsImV4cCI6MjA4ODAxNzM1OH0.pxiXNd9vlo13XEMVZwgXwukLtPrQsT3eGjjEA_ppEdA',
+    url: supabaseUrl,
+    anonKey: supabaseAnonKey,
   );
   FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBackgroundHandler);
   await NotificationService.init();
