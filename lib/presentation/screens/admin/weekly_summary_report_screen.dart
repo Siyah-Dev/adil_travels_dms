@@ -13,7 +13,8 @@ class WeeklySummaryReportScreen extends StatefulWidget {
   const WeeklySummaryReportScreen({super.key});
 
   @override
-  State<WeeklySummaryReportScreen> createState() => _WeeklySummaryReportScreenState();
+  State<WeeklySummaryReportScreen> createState() =>
+      _WeeklySummaryReportScreenState();
 }
 
 class _WeeklySummaryReportScreenState extends State<WeeklySummaryReportScreen> {
@@ -110,9 +111,7 @@ class _WeeklySummaryReportScreenState extends State<WeeklySummaryReportScreen> {
                         initialValue: ctrl.selectedDriverId.value.isEmpty
                             ? ''
                             : ctrl.selectedDriverId.value,
-                        decoration: const InputDecoration(
-                          labelText: 'Driver',
-                        ),
+                        decoration: const InputDecoration(labelText: 'Driver'),
                         items: [
                           const DropdownMenuItem<String>(
                             value: '',
@@ -153,9 +152,11 @@ class _WeeklySummaryReportScreenState extends State<WeeklySummaryReportScreen> {
                       else ...[
                         ListTile(
                           title: const Text('Start Date'),
-                          subtitle: Text(_start == null
-                              ? 'Select'
-                              : DateFormat.yMMMd().format(_start!)),
+                          subtitle: Text(
+                            _start == null
+                                ? 'Select'
+                                : DateFormat.yMMMd().format(_start!),
+                          ),
                           trailing: IconButton(
                             onPressed: () async {
                               final d = await showDatePicker(
@@ -178,9 +179,11 @@ class _WeeklySummaryReportScreenState extends State<WeeklySummaryReportScreen> {
                         ),
                         ListTile(
                           title: const Text('End Date'),
-                          subtitle: Text(_end == null
-                              ? 'Select'
-                              : DateFormat.yMMMd().format(_end!)),
+                          subtitle: Text(
+                            _end == null
+                                ? 'Select'
+                                : DateFormat.yMMMd().format(_end!),
+                          ),
                         ),
                       ],
                       ElevatedButton(
@@ -223,7 +226,10 @@ class _WeeklySummaryReportScreenState extends State<WeeklySummaryReportScreen> {
                           try {
                             await PdfUtils.previewWeeklyBill(s);
                           } catch (err) {
-                            ErrorHandler.showError(err, title: 'Could not open PDF');
+                            ErrorHandler.showError(
+                              err,
+                              title: 'Could not open PDF',
+                            );
                           }
                         });
                       },
@@ -232,10 +238,27 @@ class _WeeklySummaryReportScreenState extends State<WeeklySummaryReportScreen> {
                           try {
                             final file = await PdfUtils.generateWeeklyBill(s);
                             if (context.mounted) {
-                              ErrorHandler.showSuccess('PDF saved: ${file.path}');
+                              ErrorHandler.showSuccess(
+                                'PDF saved: ${file.path}',
+                              );
                             }
                           } catch (err) {
-                            ErrorHandler.showError(err, title: 'Could not create PDF');
+                            ErrorHandler.showError(
+                              err,
+                              title: 'Could not create PDF',
+                            );
+                          }
+                        });
+                      },
+                      onShare: () {
+                        Future.microtask(() async {
+                          try {
+                            await PdfUtils.shareWeeklyBill(s);
+                          } catch (err) {
+                            ErrorHandler.showError(
+                              err,
+                              title: 'Could not share PDF',
+                            );
                           }
                         });
                       },
@@ -255,11 +278,13 @@ class _WeeklyBillCard extends StatelessWidget {
     required this.status,
     required this.onView,
     required this.onDownload,
+    required this.onShare,
   });
 
   final WeeklyStatusEntity status;
   final VoidCallback onView;
   final VoidCallback onDownload;
+  final VoidCallback onShare;
 
   @override
   Widget build(BuildContext context) {
@@ -288,15 +313,25 @@ class _WeeklyBillCard extends StatelessWidget {
                   label: const Text('View PDF'),
                 ),
               ),
+
               const SizedBox(width: 10),
               Expanded(
                 child: OutlinedButton.icon(
-                  onPressed: onDownload,
-                  icon: const Icon(Icons.picture_as_pdf),
-                  label: const Text('Download PDF'),
+                  onPressed: onShare,
+                  icon: const Icon(Icons.share),
+                  label: const Text('Share'),
                 ),
               ),
             ],
+          ),
+          SizedBox(
+            // height: 10,
+            width: double.infinity,
+            child: OutlinedButton.icon(
+              onPressed: onDownload,
+              icon: const Icon(Icons.picture_as_pdf),
+              label: const Text('Download PDF'),
+            ),
           ),
         ],
       ),
@@ -305,11 +340,7 @@ class _WeeklyBillCard extends StatelessWidget {
 }
 
 class _Line extends StatelessWidget {
-  const _Line(
-    this.label,
-    this.value, {
-    this.bold = false,
-  });
+  const _Line(this.label, this.value, {this.bold = false});
 
   final String label;
   final dynamic value;
@@ -324,7 +355,10 @@ class _Line extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          Text(label, style: TextStyle(fontWeight: bold ? FontWeight.bold : null)),
+          Text(
+            label,
+            style: TextStyle(fontWeight: bold ? FontWeight.bold : null),
+          ),
           Text(
             display,
             style: TextStyle(fontWeight: bold ? FontWeight.bold : null),
