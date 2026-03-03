@@ -18,6 +18,7 @@ import '../../presentation/screens/admin/daily_entry_detail_screen.dart';
 import '../../presentation/screens/admin/weekly_status_screen.dart';
 import '../../presentation/screens/admin/weekly_summary_report_screen.dart';
 import '../../presentation/screens/admin/vehicle_management_screen.dart';
+import '../../presentation/screens/admin/helpline_numbers_screen.dart';
 
 /// Route names and page list.
 /// Paste in: lib/core/routes/app_pages.dart
@@ -38,6 +39,7 @@ abstract class AppRoutes {
   static const adminWeeklyStatus = '/admin/weekly-status';
   static const adminWeeklySummaryReport = '/admin/weekly-summary-report';
   static const adminVehicles = '/admin/vehicles';
+  static const adminHelplineNumbers = '/admin/helpline-numbers';
 }
 
 class AppPages {
@@ -120,6 +122,11 @@ class AppPages {
     GetPage(
       name: AppRoutes.adminVehicles,
       page: () => const VehicleManagementScreen(),
+      binding: AdminBinding(),
+    ),
+    GetPage(
+      name: AppRoutes.adminHelplineNumbers,
+      page: () => const HelplineNumbersScreen(),
       binding: AdminBinding(),
     ),
   ];

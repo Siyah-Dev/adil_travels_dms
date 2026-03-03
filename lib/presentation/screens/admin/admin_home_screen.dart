@@ -62,6 +62,7 @@ class AdminHomeScreen extends StatelessWidget {
             subtitle: 'Add or remove vehicles for drivers',
             onTap: () => Get.toNamed(AppRoutes.adminVehicles),
           ),
+
           NavigationMenuTile(
             icon: Icons.date_range,
             title: 'Work Status',
@@ -73,6 +74,12 @@ class AdminHomeScreen extends StatelessWidget {
             title: 'View Summary Report',
             subtitle: 'Filter by date range and download PDF',
             onTap: () => Get.toNamed(AppRoutes.adminWeeklySummaryReport),
+          ),
+          NavigationMenuTile(
+            icon: Icons.support_agent,
+            title: 'Helpline Numbers',
+            subtitle: 'Manage office and 3 individual contact numbers',
+            onTap: () => Get.toNamed(AppRoutes.adminHelplineNumbers),
           ),
         ],
       ),

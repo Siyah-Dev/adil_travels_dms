@@ -1,6 +1,7 @@
 import '../../core/constants/app_constants.dart';
 import '../../domain/entities/driver_profile_entity.dart';
 import '../../domain/entities/daily_entry_entity.dart';
+import '../../domain/entities/helpline_numbers_entity.dart';
 import '../../domain/entities/weekly_status_entity.dart';
 import '../../domain/entities/vehicle_entity.dart';
 import '../../domain/repositories/driver_repository.dart';
@@ -127,4 +128,12 @@ class DriverRepositoryImpl implements DriverRepository {
   @override
   Future<List<WeeklyStatusEntity>> getWeeklyStatusesInRange(DateTime start, DateTime end) =>
       _driverDs.getWeeklyStatusesInRange(start, end);
+
+  @override
+  Future<HelplineNumbersEntity?> getHelplineNumbers() =>
+      _driverDs.getHelplineNumbers();
+
+  @override
+  Future<void> saveHelplineNumbers(HelplineNumbersEntity helplineNumbers) =>
+      _driverDs.saveHelplineNumbers(helplineNumbers);
 }

@@ -1,5 +1,6 @@
 import '../entities/driver_profile_entity.dart';
 import '../entities/daily_entry_entity.dart';
+import '../entities/helpline_numbers_entity.dart';
 import '../entities/weekly_status_entity.dart';
 import '../entities/vehicle_entity.dart';
 
@@ -31,4 +32,8 @@ abstract class DriverRepository {
   Future<WeeklyStatusEntity?> getWeeklyStatus(String driverId, DateTime weekStart);
   Future<List<WeeklyStatusEntity>> getWeeklyStatusesByDriver(String driverId, {DateTime? start, DateTime? end});
   Future<List<WeeklyStatusEntity>> getWeeklyStatusesInRange(DateTime start, DateTime end);
+
+  // Helpline numbers
+  Future<HelplineNumbersEntity?> getHelplineNumbers();
+  Future<void> saveHelplineNumbers(HelplineNumbersEntity helplineNumbers);
 }

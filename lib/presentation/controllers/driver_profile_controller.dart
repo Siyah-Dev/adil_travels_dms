@@ -41,6 +41,12 @@ class DriverProfileController extends GetxController {
     required String aadharNumber,
     required String drivingLicenceNumber,
   }) async {
+    final mobile = mobileNumber.trim();
+    if (!RegExp(r'^\d{10}$').hasMatch(mobile)) {
+      ErrorHandler.showInfo('Mobile number must be exactly 10 digits.');
+      return;
+    }
+
     isLoading.value = true;
     try {
       final existing = profile.value;
@@ -52,7 +58,7 @@ class DriverProfileController extends GetxController {
         address: address?.trim(),
         place: place?.trim(),
         pincode: pincode?.trim(),
-        mobileNumber: mobileNumber.trim(),
+        mobileNumber: mobile,
         aadharNumber: aadharNumber.trim(),
         drivingLicenceNumber: drivingLicenceNumber.trim(),
         profileImagePath: existing?.profileImagePath,
