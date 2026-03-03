@@ -12,7 +12,7 @@ class AdminDriverListController extends GetxController {
 
   final RxList<DriverProfileEntity> drivers = <DriverProfileEntity>[].obs;
   final RxList<DriverProfileEntity> filteredDrivers = <DriverProfileEntity>[].obs;
-  final RxMap<String, String> todayVehicleByDriver = <String, String>{}.obs;
+  final RxMap<String, DailyEntryEntity> todayEntryByDriver = <String, DailyEntryEntity>{}.obs;
   final RxBool isLoading = false.obs;
   final RxString searchQuery = ''.obs;
 
@@ -75,17 +75,9 @@ class AdminDriverListController extends GetxController {
           latestByDriver[entry.driverId] = entry;
         }
       }
-
-      final mapped = <String, String>{};
-      for (final entry in latestByDriver.values) {
-        final number = entry.vehicleNumber?.trim() ?? '';
-        if (number.isNotEmpty) {
-          mapped[entry.driverId] = number;
-        }
-      }
-      todayVehicleByDriver.assignAll(mapped);
+      todayEntryByDriver.assignAll(latestByDriver);
     } catch (_) {
-      todayVehicleByDriver.clear();
+      todayEntryByDriver.clear();
     }
   }
 

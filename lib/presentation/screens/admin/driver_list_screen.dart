@@ -1,14 +1,29 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:url_launcher/url_launcher.dart';
 import '../../../core/routes/app_pages.dart';
 import '../../../core/services/supabase_storage_service.dart';
 import '../../../core/utils/app_dialogs.dart';
+import '../../../core/utils/error_handler.dart';
+import '../../../domain/entities/daily_entry_entity.dart';
 import '../../../domain/entities/driver_profile_entity.dart';
 import '../../controllers/admin_driver_list_controller.dart';
 
 /// Paste in: lib/presentation/screens/admin/driver_list_screen.dart
 class DriverListScreen extends StatelessWidget {
   const DriverListScreen({super.key});
+
+  Future<void> _call(String? mobileNumber) async {
+    final number = mobileNumber?.trim() ?? '';
+    if (number.isEmpty) return;
+
+    final uri = Uri(scheme: 'tel', path: number);
+    if (await canLaunchUrl(uri)) {
+      await launchUrl(uri);
+      return;
+    }
+    ErrorHandler.showInfo('Could not open dialer.', title: 'Call failed');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -36,10 +51,11 @@ class DriverListScreen extends StatelessWidget {
                         itemCount: ctrl.filteredDrivers.length,
                         itemBuilder: (_, i) {
                           final d = ctrl.filteredDrivers[i];
-                          final todayVehicle = ctrl.todayVehicleByDriver[d.userId];
+                          final todayEntry = ctrl.todayEntryByDriver[d.userId];
                           return _DriverTile(
                             driver: d,
-                            todayVehicleNumber: todayVehicle,
+                            todayEntry: todayEntry,
+                            onCall: () => _call(d.mobileNumber),
                             onTap: () => Get.toNamed(
                               AppRoutes.adminDriverDetail,
                               arguments: d.userId,
@@ -69,7 +85,8 @@ class DriverListScreen extends StatelessWidget {
 class _DriverTile extends StatelessWidget {
   const _DriverTile({
     required this.driver,
-    required this.todayVehicleNumber,
+    required this.todayEntry,
+    required this.onCall,
     required this.onTap,
     required this.onDelete,
     required this.onSuspend,
@@ -77,7 +94,8 @@ class _DriverTile extends StatelessWidget {
   });
 
   final DriverProfileEntity driver;
-  final String? todayVehicleNumber;
+  final DailyEntryEntity? todayEntry;
+  final VoidCallback onCall;
   final VoidCallback onTap;
   final VoidCallback onDelete;
   final VoidCallback onSuspend;
@@ -87,18 +105,27 @@ class _DriverTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final mobile = driver.mobileNumber?.trim() ?? '';
     final hasMobile = mobile.isNotEmpty;
-    final vehicleNumber = todayVehicleNumber?.trim() ?? '';
+    final vehicleNumber = todayEntry?.vehicleNumber?.trim() ?? '';
+    final leaveToday = todayEntry?.leaveOnToday ?? false;
+
+    final subtitle = leaveToday
+        ? 'On leave today'
+        : (vehicleNumber.isNotEmpty ? vehicleNumber : 'No vehicle selected');
 
     return ListTile(
       leading: _DriverAvatar(imagePath: driver.profileImagePath),
       title: Text(driver.name),
-      subtitle: Text(hasMobile ? mobile : 'Mobile number not available'),
+      subtitle: Text(subtitle),
       trailing: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Text(
-            vehicleNumber.isEmpty ? '-' : vehicleNumber,
-            style: Theme.of(context).textTheme.bodyMedium,
+          IconButton(
+            onPressed: hasMobile ? onCall : null,
+            tooltip: hasMobile ? 'Call' : 'Mobile not available',
+            icon: Icon(
+              Icons.call,
+              color: hasMobile ? Theme.of(context).colorScheme.primary : Colors.grey,
+            ),
           ),
           PopupMenuButton<String>(
             onSelected: (v) {
