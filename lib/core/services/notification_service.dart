@@ -1,4 +1,5 @@
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:get/get.dart';
 import '../../data/datasources/firebase_auth_datasource.dart';
@@ -13,12 +14,18 @@ class NotificationService {
 
   static Future<void> init() async {
     await _requestPermission();
-    await _initLocalNotifications();
+    if (!kIsWeb) {
+      await _initLocalNotifications();
+    }
     FirebaseMessaging.onMessage.listen(_onForegroundMessage);
     FirebaseMessaging.onMessageOpenedApp.listen(_onOpenApp);
-    final token = await _fcm.getToken();
-    _saveTokenIfLoggedIn(token);
-    _fcm.onTokenRefresh.listen(_saveTokenIfLoggedIn);
+    try {
+      final token = await _fcm.getToken();
+      _saveTokenIfLoggedIn(token);
+      _fcm.onTokenRefresh.listen(_saveTokenIfLoggedIn);
+    } catch (_) {
+      // Web FCM token generation can fail if service worker or browser setup is incomplete.
+    }
   }
 
   static void updateTokenForUser(String uid) async {
@@ -50,6 +57,7 @@ class NotificationService {
   static void _onForegroundMessage(RemoteMessage m) {
     final title = m.notification?.title ?? 'Reminder';
     final body = m.notification?.body ?? '';
+    if (kIsWeb) return;
     _showLocal(title: title, body: body);
   }
 

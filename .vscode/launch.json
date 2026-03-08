@@ -2,13 +2,36 @@
   "version": "0.2.0",
   "configurations": [
     {
-      "name": "Flutter",
+      "name": "Flutter (Mobile)",
       "request": "launch",
       "type": "dart",
       "program": "lib/main.dart",
       "toolArgs": [
         "--dart-define=SUPABASE_URL=https://agnntanzguifeporkvaw.supabase.co",
-        "--dart-define=SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnbm50YW56Z3VpZmVwb3JrdmF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0NDEzNTgsImV4cCI6MjA4ODAxNzM1OH0.pxiXNd9vlo13XEMVZwgXwukLtPrQsT3eGjjEA_ppEdA"
+        "--dart-define=SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnbm50YW56Z3VpZmVwb3JrdmF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0NDEzNTgsImV4cCI6MjA4ODAxNzM1OH0.pxiXNd9vlo13XEMVZwgXwukLtPrQsT3eGjjEA_ppEdA",
+        "--dart-define=FIREBASE_WEB_API_KEY=AIzaSyAi2dvfPvFbH8aJOoAuje0ImXsRnI_TS-I",
+        "--dart-define=FIREBASE_WEB_APP_ID=1:440481124362:web:7c9fc6ef224b351a290ff3",
+        "--dart-define=FIREBASE_WEB_MESSAGING_SENDER_ID=440481124362",
+        "--dart-define=FIREBASE_WEB_PROJECT_ID=adil-taxi-dms",
+        "--dart-define=FIREBASE_WEB_AUTH_DOMAIN=adil-taxi-dms.firebaseapp.com",
+        "--dart-define=FIREBASE_WEB_STORAGE_BUCKET=adil-taxi-dms.firebasestorage.app"
+      ]
+    },
+    {
+      "name": "Flutter (Chrome)",
+      "request": "launch",
+      "type": "dart",
+      "program": "lib/main.dart",
+      "deviceId": "chrome",
+      "toolArgs": [
+        "--dart-define=SUPABASE_URL=https://agnntanzguifeporkvaw.supabase.co",
+        "--dart-define=SUPABASE_ANON_KEY=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFnbm50YW56Z3VpZmVwb3JrdmF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzI0NDEzNTgsImV4cCI6MjA4ODAxNzM1OH0.pxiXNd9vlo13XEMVZwgXwukLtPrQsT3eGjjEA_ppEdA",
+        "--dart-define=FIREBASE_WEB_API_KEY=AIzaSyAi2dvfPvFbH8aJOoAuje0ImXsRnI_TS-I",
+        "--dart-define=FIREBASE_WEB_APP_ID=1:440481124362:web:7c9fc6ef224b351a290ff3",
+        "--dart-define=FIREBASE_WEB_MESSAGING_SENDER_ID=440481124362",
+        "--dart-define=FIREBASE_WEB_PROJECT_ID=adil-taxi-dms",
+        "--dart-define=FIREBASE_WEB_AUTH_DOMAIN=adil-taxi-dms.firebaseapp.com",
+        "--dart-define=FIREBASE_WEB_STORAGE_BUCKET=adil-taxi-dms.firebasestorage.app"
       ]
     }
   ]

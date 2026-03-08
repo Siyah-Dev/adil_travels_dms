@@ -34,6 +34,14 @@ class FirebaseDriverDatasource {
     return number.trim().toLowerCase().replaceAll(RegExp(r'[^a-z0-9]+'), '_');
   }
 
+  String _weeklyStatusDocId(String driverId, DateTime weekStart, DateTime weekEnd) {
+    final ws = DateTime(weekStart.year, weekStart.month, weekStart.day);
+    final we = DateTime(weekEnd.year, weekEnd.month, weekEnd.day);
+    String fmt(DateTime d) =>
+        '${d.year}${d.month.toString().padLeft(2, '0')}${d.day.toString().padLeft(2, '0')}';
+    return '${driverId}_${fmt(ws)}_${fmt(we)}';
+  }
+
   // --- Driver profile (docId = userId)
   Future<DriverProfileEntity?> getDriverProfile(String userId) async {
     final doc = await _firestore.collection(_driversPath).doc(userId).get();
@@ -229,12 +237,17 @@ class FirebaseDriverDatasource {
   Future<void> saveWeeklyStatus(WeeklyStatusEntity status) async {
     final model = WeeklyStatusModel.fromEntity(status);
     final data = model.toFirestore();
-    data['createdAt'] = DateTime.now();
-    if (status.id.isEmpty) {
-      await _firestore.collection(_weeklyPath).add(data);
-      return;
+    final docId = status.id.isNotEmpty
+        ? status.id
+        : _weeklyStatusDocId(status.driverId, status.weekStartDate, status.weekEndDate);
+
+    final docRef = _firestore.collection(_weeklyPath).doc(docId);
+    final existing = await docRef.get();
+    data['updatedAt'] = FieldValue.serverTimestamp();
+    if (!existing.exists) {
+      data['createdAt'] = FieldValue.serverTimestamp();
     }
-    await _firestore.collection(_weeklyPath).doc(status.id).set(data, SetOptions(merge: true));
+    await docRef.set(data, SetOptions(merge: true));
   }
 
   Future<WeeklyStatusEntity?> getWeeklyStatus(String driverId, DateTime weekStart) async {
@@ -278,8 +291,7 @@ class FirebaseDriverDatasource {
     try {
       final snap = await q.get();
       final statuses = snap.docs.map((d) => WeeklyStatusModel.fromFirestore(d.data(), d.id)).toList();
-      statuses.sort((a, b) => b.weekStartDate.compareTo(a.weekStartDate));
-      return statuses;
+      return _dedupeWeeklyStatuses(statuses, descending: true);
     } on FirebaseException catch (e) {
       if (e.code != 'failed-precondition') rethrow;
 
@@ -300,9 +312,7 @@ class FirebaseDriverDatasource {
             !day.isAfter(DateTime(end.year, end.month, end.day));
         return afterStart && beforeEnd;
       }).toList();
-
-      filtered.sort((a, b) => b.weekStartDate.compareTo(a.weekStartDate));
-      return filtered;
+      return _dedupeWeeklyStatuses(filtered, descending: true);
     }
   }
 
@@ -314,8 +324,7 @@ class FirebaseDriverDatasource {
           .where('weekStartDate', isLessThanOrEqualTo: end)
           .get();
       final statuses = snap.docs.map((d) => WeeklyStatusModel.fromFirestore(d.data(), d.id)).toList();
-      statuses.sort((a, b) => a.weekStartDate.compareTo(b.weekStartDate));
-      return statuses;
+      return _dedupeWeeklyStatuses(statuses);
     } on FirebaseException catch (e) {
       if (e.code != 'failed-precondition') rethrow;
 
@@ -331,10 +340,36 @@ class FirebaseDriverDatasource {
         return !day.isBefore(DateTime(start.year, start.month, start.day)) &&
             !day.isAfter(DateTime(end.year, end.month, end.day));
       }).toList();
-      statuses.sort((a, b) => a.weekStartDate.compareTo(b.weekStartDate));
-      return statuses;
+      return _dedupeWeeklyStatuses(statuses);
     }
   }
+
+  List<WeeklyStatusEntity> _dedupeWeeklyStatuses(
+    List<WeeklyStatusEntity> input, {
+    bool descending = false,
+  }) {
+    final latestByKey = <String, WeeklyStatusEntity>{};
+
+    for (final s in input) {
+      final ws = DateTime(s.weekStartDate.year, s.weekStartDate.month, s.weekStartDate.day);
+      final we = DateTime(s.weekEndDate.year, s.weekEndDate.month, s.weekEndDate.day);
+      final key = '${s.driverId}_${ws.toIso8601String()}_${we.toIso8601String()}';
+      final existing = latestByKey[key];
+      if (existing == null || _statusSortTime(s).isAfter(_statusSortTime(existing))) {
+        latestByKey[key] = s;
+      }
+    }
+
+    final list = latestByKey.values.toList();
+    list.sort((a, b) => a.weekStartDate.compareTo(b.weekStartDate));
+    if (descending) {
+      return list.reversed.toList();
+    }
+    return list;
+  }
+
+  DateTime _statusSortTime(WeeklyStatusEntity s) =>
+      s.updatedAt ?? s.createdAt ?? s.weekStartDate;
 
   // --- Helpline numbers
   Future<HelplineNumbersEntity?> getHelplineNumbers() async {

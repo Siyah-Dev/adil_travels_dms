@@ -47,6 +47,8 @@ class DriverContactsScreen extends StatelessWidget {
             separatorBuilder: (context, index) => const SizedBox(height: 10),
             itemBuilder: (_, i) {
               final driver = ctrl.drivers[i];
+              final isMobileNumberAvailable =
+                  driver.mobileNumber?.trim().isNotEmpty ?? false;
               return Card(
                 child: ListTile(
                   contentPadding: const EdgeInsets.symmetric(
@@ -60,8 +62,7 @@ class DriverContactsScreen extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                   subtitle: Text(
-                    (driver.mobileNumber == null ||
-                            driver.mobileNumber!.trim().isEmpty)
+                    (driver.mobileNumber == null || !isMobileNumberAvailable)
                         ? 'Mobile Number not available'
                         : driver.mobileNumber!,
                     maxLines: 1,
@@ -70,7 +71,12 @@ class DriverContactsScreen extends StatelessWidget {
                   trailing: IconButton(
                     onPressed: () => _call(driver.mobileNumber),
                     tooltip: 'Call',
-                    icon: const Icon(Icons.call),
+                    icon: Icon(
+                      Icons.call,
+                      color: isMobileNumberAvailable
+                          ? Theme.of(context).colorScheme.primary
+                          : Colors.grey,
+                    ),
                   ),
                 ),
               );

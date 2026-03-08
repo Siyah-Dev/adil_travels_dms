@@ -1,5 +1,6 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
@@ -12,13 +13,53 @@ import 'core/services/notification_service.dart';
 
 @pragma('vm:entry-point')
 Future<void> _firebaseMessagingBackgroundHandler(RemoteMessage m) async {
-  await Firebase.initializeApp();
+  if (Firebase.apps.isEmpty) {
+    await Firebase.initializeApp();
+  }
+}
+
+Future<void> _initializeFirebase() async {
+  if (!kIsWeb) {
+    await Firebase.initializeApp();
+    return;
+  }
+
+  const apiKey = String.fromEnvironment('FIREBASE_WEB_API_KEY');
+  const appId = String.fromEnvironment('FIREBASE_WEB_APP_ID');
+  const messagingSenderId = String.fromEnvironment('FIREBASE_WEB_MESSAGING_SENDER_ID');
+  const projectId = String.fromEnvironment('FIREBASE_WEB_PROJECT_ID');
+  const authDomain = String.fromEnvironment('FIREBASE_WEB_AUTH_DOMAIN');
+  const storageBucket = String.fromEnvironment('FIREBASE_WEB_STORAGE_BUCKET');
+
+  if (apiKey.isEmpty ||
+      appId.isEmpty ||
+      messagingSenderId.isEmpty ||
+      projectId.isEmpty ||
+      authDomain.isEmpty ||
+      storageBucket.isEmpty) {
+    throw Exception(
+      'Firebase Web config missing. Pass FIREBASE_WEB_API_KEY, FIREBASE_WEB_APP_ID, '
+      'FIREBASE_WEB_MESSAGING_SENDER_ID, FIREBASE_WEB_PROJECT_ID, FIREBASE_WEB_AUTH_DOMAIN, '
+      'and FIREBASE_WEB_STORAGE_BUCKET via --dart-define.',
+    );
+  }
+
+  await Firebase.initializeApp(
+    options: const FirebaseOptions(
+      apiKey: apiKey,
+      appId: appId,
+      messagingSenderId: messagingSenderId,
+      projectId: projectId,
+      authDomain: authDomain,
+      storageBucket: storageBucket,
+    ),
+  );
 }
 
 /// Paste in: lib/main.dart
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await _initializeFirebase();
   const supabaseUrl = String.fromEnvironment('SUPABASE_URL');
   const supabaseAnonKey = String.fromEnvironment('SUPABASE_ANON_KEY');
 
